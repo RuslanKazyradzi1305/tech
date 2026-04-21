@@ -1,0 +1,6 @@
+{
+  "name": "Remix: Technical Spec App",
+  "description": "Система управления планом закупок и автоматизации технических спецификаций на двух языках (RU/KZ).",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

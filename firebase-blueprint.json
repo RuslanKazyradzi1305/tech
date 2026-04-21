@@ -1,0 +1,97 @@
+{
+  "entities": {
+    "PlanItem": {
+      "title": "Procurement Plan Item",
+      "description": "A single row/item in the procurement plan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "rowNum": { "type": "string" },
+        "type": { "type": "string" },
+        "itemKind": { "type": "string" },
+        "code": { "type": "string" },
+        "nameKz": { "type": "string" },
+        "nameRu": { "type": "string" },
+        "descKz": { "type": "string" },
+        "descRu": { "type": "string" },
+        "extraDescKz": { "type": "string" },
+        "extraDescRu": { "type": "string" },
+        "budgetRuName": { "type": "string" },
+        "procurementMethod": { "type": "string" },
+        "unit": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unitPrice": { "type": "number" },
+        "totalSumApproB": { "type": "number" },
+        "sum2026": { "type": "number" },
+        "month": { "type": "string" },
+        "deliveryPeriodKz": { "type": "string" },
+        "deliveryPeriodRu": { "type": "string" },
+        "kato": { "type": "string" },
+        "deliveryPlaceKz": { "type": "string" },
+        "deliveryPlaceRu": { "type": "string" },
+        "advancePercent": { "type": "number" },
+        "initiator": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" },
+        "companyId": { "type": "string", "default": "default" }
+      },
+      "required": ["code", "nameRu", "companyId"]
+    },
+    "PlanHistory": {
+      "title": "Plan Adjustment History",
+      "description": "A record of plan uploads and changes",
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "createdByName": { "type": "string" },
+        "addedCount": { "type": "number" },
+        "removedCount": { "type": "number" },
+        "updatedCount": { "type": "number" },
+        "changesSummary": { "type": "string" },
+        "companyId": { "type": "string", "default": "default" }
+      },
+      "required": ["createdAt", "createdBy", "companyId"]
+    },
+    "DashboardStats": {
+      "title": "Dashboard Statistics",
+      "description": "Manually managed dashboard statistics and chart data",
+      "type": "object",
+      "properties": {
+        "companyId": { "type": "string", "default": "default" },
+        "totalBudget": { "type": "number" },
+        "savings": { "type": "number" },
+        "executionStatus": { "type": "number" },
+        "methodTender": { "type": "number" },
+        "methodZCP": { "type": "number" },
+        "methodOI": { "type": "number" },
+        "q1Plan": { "type": "number" },
+        "q1Fact": { "type": "number" },
+        "q2Plan": { "type": "number" },
+        "q2Fact": { "type": "number" },
+        "q3Plan": { "type": "number" },
+        "q3Fact": { "type": "number" },
+        "q4Plan": { "type": "number" },
+        "q4Fact": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" }
+      },
+      "required": ["companyId"]
+    }
+  },
+  "firestore": {
+    "planItems/{itemId}": {
+      "schema": { "$ref": "#/entities/PlanItem" },
+      "description": "The centralized procurement plan items."
+    },
+    "planHistory/{historyId}": {
+      "schema": { "$ref": "#/entities/PlanHistory" },
+      "description": "The adjustment history records."
+    },
+    "dashboardStats/{statsId}": {
+      "schema": { "$ref": "#/entities/DashboardStats" },
+      "description": "Dashboard statistics for manual adjustments."
+    }
+  }
+}

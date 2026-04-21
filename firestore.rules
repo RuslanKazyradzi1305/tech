@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} { allow read, write: if false; }
+
+    function isSignedIn() { 
+      return request.auth != null && request.auth.token.email_verified == true; 
+    }
+    
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+
+    function isValidPlanItem(data) {
+      return data.keys().hasAll(['code', 'nameRu', 'createdAt', 'companyId'])
+        && data.code is string && data.code.size() <= 200
+        && data.nameRu is string && data.nameRu.size() <= 1000
+        && data.companyId is string && data.companyId.size() <= 100
+        && ( ('quantity' in data) ? (data.quantity is number) : true )
+        && ( ('unitPrice' in data) ? (data.unitPrice is number) : true )
+        && ( ('totalSumApproB' in data) ? (data.totalSumApproB is number) : true );
+    }
+
+    function isValidPlanHistory(data) {
+      return data.keys().hasAll(['createdAt', 'createdBy', 'addedCount', 'removedCount', 'updatedCount', 'companyId'])
+        && data.createdBy is string && data.createdBy.size() <= 128
+        && data.companyId is string && data.companyId.size() <= 100
+        && data.addedCount is number
+        && data.removedCount is number
+        && data.updatedCount is number;
+    }
+
+    match /planItems/{itemId} {
+      allow list: if isSignedIn() && resource.data.companyId == 'default';
+      allow get: if isSignedIn() && isValidId(itemId) && resource.data.companyId == 'default';
+      allow create: if isSignedIn()
+        && isValidId(itemId)
+        && isValidPlanItem(incoming())
+        && incoming().companyId == 'default'
+        && incoming().createdAt == request.time;
+      allow update: if isSignedIn()
+        && isValidId(itemId)
+        && isValidPlanItem(incoming())
+        && incoming().diff(existing()).affectedKeys().hasAny(['code', 'nameKz', 'nameRu', 'quantity', 'unitPrice', 'totalSumApproB', 'updatedAt', 'updatedBy', 'type', 'itemKind', 'descKz', 'descRu', 'extraDescKz', 'extraDescRu', 'budgetRuName', 'procurementMethod', 'unit', 'sum2026', 'month', 'deliveryPeriodKz', 'deliveryPeriodRu', 'kato', 'deliveryPlaceKz', 'deliveryPlaceRu', 'advancePercent', 'initiator', 'rowNum'])
+        && incoming().companyId == existing().companyId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time;
+      allow delete: if isSignedIn() && isValidId(itemId) && existing().companyId == 'default';
+    }
+
+    match /planHistory/{historyId} {
+      allow list: if isSignedIn() && resource.data.companyId == 'default';
+      allow get: if isSignedIn() && isValidId(historyId) && resource.data.companyId == 'default';
+      allow create: if isSignedIn()
+        && isValidId(historyId)
+        && isValidPlanHistory(incoming())
+        && incoming().companyId == 'default'
+        && incoming().createdAt == request.time
+        && incoming().createdBy == request.auth.uid;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    match /dashboardStats/{statsId} {
+      allow read: if isSignedIn() && resource.data.companyId == 'default';
+      allow write: if isSignedIn() && isValidId(statsId) && incoming().companyId == 'default';
+    }
+  }
+}
