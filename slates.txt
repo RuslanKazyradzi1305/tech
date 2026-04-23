@@ -1,0 +1,64 @@
+162:    return <div className="flex h-screen items-center justify-center font-bold text-slate-500 bg-slate-50">{loadingText}</div>;
+178:             <h1 className="text-2xl font-bold text-slate-800 tracking-tight text-center mb-3">
+181:             <p className="text-slate-500 text-[13px] text-center mb-8 font-medium px-4">
+200:                 <div className="flex items-center gap-2 px-3 py-1 bg-white/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-500">
+203:                    <button onClick={() => setLang('ru')} className={`font-bold transition-colors ${lang === 'ru' ? 'text-blue-600' : 'hover:text-slate-800'}`}>RU</button>
+205:                    <button onClick={() => setLang('kz')} className={`font-bold transition-colors ${lang === 'kz' ? 'text-blue-600' : 'hover:text-slate-800'}`}>KZ</button>
+231:            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'dashboard' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+239:            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'cabinet' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+247:            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'plan' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+254:            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'spec' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+261:            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'structure' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+268:            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'initiators' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+278:            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'wiki' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+288:            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'history' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+297:                className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'trash' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+304:                className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'admin' as any ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+316:               <div className="text-xs font-semibold px-2 truncate text-slate-600" title={user.email}>{user.email}</div>
+326:               className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
+334:                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'ru' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
+340:                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'kz' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
+599:                    <td className="py-3 px-4 font-bold text-slate-700">{init.count}</td>
+608:             <div className="p-4 text-center text-slate-500 opacity-60 font-medium">Нет данных об инициаторах</div>
+714:          className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors cursor-pointer hover:bg-white/40 ${level === 0 ? 'font-bold text-slate-800' : 'text-slate-600 text-sm'}`}
+722:          <Icon className={`w-4 h-4 shrink-0 ${node.type === 'person' ? 'text-blue-500' : 'text-slate-500'}`} />
+930:        <p className="text-sm text-slate-500 mb-8 italic">Данные будут перемещены в корзину, где вы сможете просмотреть их или восстановить.</p>
+1002:            <div className="flex h-full items-center justify-center text-slate-400 font-medium">Нет записей в истории</div>
+1018:                       <h3 className="font-bold text-slate-800 text-lg">Загрузка плана</h3>
+1119:          <h1 className="text-3xl font-bold tracking-tight text-slate-800 flex items-center gap-3">
+1122:          <p className="text-sm text-slate-500 mt-1 font-medium italic">Место для временного хранения удаленных данных</p>
+1135:               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'plan' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+1141:               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'history' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+1155:                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Удалено {item.deletedAt?.toDate ? format(item.deletedAt.toDate(), 'dd.MM.yyyy HH:mm') : '-'}</span>
+1156:                       <h4 className="font-bold text-slate-800 truncate" title={item.nameRu}>{item.nameRu}</h4>
+1157:                       <span className="text-xs text-slate-500 font-medium">№ п/п: {item.rowNum} | Бюджет: {item.totalSumApproB?.toLocaleString('ru-RU')} ₸</span>
+1179:               {trashData.plan.length === 0 && <div className="text-center p-12 text-slate-400 font-medium italic">Корзина планов пуста</div>}
+1186:                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Удалено {record.deletedAt?.toDate ? format(record.deletedAt.toDate(), 'dd.MM.yyyy HH:mm') : '-'}</span>
+1187:                       <h4 className="font-bold text-slate-800">Загрузка плана от {record.createdAt?.toDate ? format(record.createdAt.toDate(), 'dd.MM.yyyy') : '-'}</h4>
+1188:                       <span className="text-xs text-slate-500 font-medium">{record.changesSummary}</span>
+1210:               {trashData.history.length === 0 && <div className="text-center p-12 text-slate-400 font-medium italic">Корзина истории пуста</div>}
+1400:            <h3 className="text-2xl font-bold text-slate-800">Предпросмотр загрузки</h3>
+1401:            <p className="text-slate-600 text-sm">
+1422:                className="px-5 py-2.5 rounded-xl font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+1447:                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+1557:                   <td colSpan={25} className="p-8 text-center text-slate-500 font-medium">
+1720:                   className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+1730:               className="glass-input px-3 py-2 text-sm font-medium w-full text-slate-800 bg-white/70 cursor-pointer outline-none hover:bg-white/90 transition-colors" 
+1745:                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">{txt.approverFields}</h3>
+1750:                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">{txt.developerFields}</h3>
+1755:                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">{txt.extraFields}</h3>
+1766:           <div className="h-48 glass-card border-dashed border-2 flex items-center justify-center text-slate-400 font-medium">
+1920:            <p className="text-slate-500 font-medium">Подача заявок на включение в план напрямую</p>
+1933:          <p className="text-sm opacity-70 mb-4 dark:text-slate-300">Укажите наименование, количество, цену и отправьте в обработку. Данные поступят экономистам напрямую.</p>
+1952:          <h4 className="font-bold mb-4 opacity-70 dark:text-slate-300 flex items-center gap-2">
+1958:                <div className="text-slate-500">Заявок пока нет.</div>
+1961:                  <div key={r.id} className="bg-white/40 dark:bg-slate-800/40 p-5 rounded-xl border border-white/30 dark:border-slate-700/50 flex flex-col gap-2 dark:text-slate-200">
+1993:            <p className="text-slate-500 font-medium">Регламенты, инструкции и FAQ для всех сотрудников DTJ</p>
+1998:         <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 w-5 h-5 dark:text-slate-400" />
+1999:         <input type="text" placeholder="Найти инструкцию (например, 'Как заключить допник')" className="glass-input w-full p-4 pl-12 text-lg shadow-lg dark:text-slate-200" />
+2014:               <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{w.d}</p>
+2125:                <XCircle className="w-5 h-5 text-slate-500 dark:text-slate-300" />
+2132:                   <MessageSquare className="w-12 h-12 mb-3 dark:text-slate-400" />
+2133:                   <p className="text-sm font-medium dark:text-slate-400">Пока нет комментариев.<br/>Задайте вопрос по этой закупке.</p>
+2140:                       <span className="text-[10px] opacity-40 font-semibold mb-1 px-1 flex gap-2 dark:text-slate-400">
+2143:                       <div className={`px-4 py-2.5 max-w-[85%] rounded-2xl text-sm leading-relaxed shadow-sm ${isMe ? 'bg-indigo-500 text-white rounded-tr-sm' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-tl-sm dark:text-slate-200'}`}>

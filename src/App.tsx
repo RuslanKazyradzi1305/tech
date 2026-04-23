@@ -159,26 +159,26 @@ export default function App() {
   const txt = t[lang];
 
   if (loadingText) {
-    return <div className="flex h-screen items-center justify-center font-bold text-slate-500 bg-slate-50">{loadingText}</div>;
+    return <div className="flex h-screen items-center justify-center font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900">{loadingText}</div>;
   }
 
   // Guard the app behind the Login Screen
   if (!user) {
     return (
-      <div className="flex h-screen w-full relative isolate overflow-hidden bg-slate-50">
+      <div className="flex h-screen w-full relative isolate overflow-hidden bg-slate-50 dark:bg-slate-900">
         <div className="glow-orb bg-indigo-300 w-[600px] h-[600px] top-[-200px] left-[-200px]"></div>
         <div className="glow-orb bg-emerald-200 w-[500px] h-[500px] bottom-[-100px] right-[-100px]"></div>
         
         <div className="w-full h-full flex flex-col items-center justify-center relative z-10 p-4">
           <div className="glass-card flex flex-col items-center p-10 max-w-[420px] w-full shadow-2xl relative bg-white/70 backdrop-blur-xl">
-             <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 mb-6 shadow-sm border border-blue-200">
+             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6 shadow-sm border border-blue-200 dark:border-blue-800/50">
                <Box className="w-8 h-8" />
              </div>
              
-             <h1 className="text-2xl font-bold text-slate-800 tracking-tight text-center mb-3">
+             <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200 tracking-tight text-center mb-3">
                Tech Spec System
              </h1>
-             <p className="text-slate-500 text-[13px] text-center mb-8 font-medium px-4">
+             <p className="text-slate-500 dark:text-slate-400 text-[13px] text-center mb-8 font-medium px-4">
                Для доступа к графику закупок, истории и панелям аналитики, пожалуйста, авторизуйтесь в корпоративной сети
              </p>
 
@@ -197,12 +197,12 @@ export default function App() {
              </button>
              
              <div className="mt-8 pt-6 border-t border-slate-200/50 w-full flex justify-center">
-                 <div className="flex items-center gap-2 px-3 py-1 bg-white/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-500">
+                 <div className="flex items-center gap-2 px-3 py-1 bg-white/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-500 dark:text-slate-400">
                     <Globe className="w-3.5 h-3.5" />
                     <span>Язык интерфейса:</span>
-                    <button onClick={() => setLang('ru')} className={`font-bold transition-colors ${lang === 'ru' ? 'text-blue-600' : 'hover:text-slate-800'}`}>RU</button>
+                    <button onClick={() => setLang('ru')} className={`font-bold transition-colors ${lang === 'ru' ? 'text-blue-600 dark:text-blue-400' : 'hover:text-slate-800 dark:hover:text-slate-200'}`}>RU</button>
                     <span className="opacity-30">|</span>
-                    <button onClick={() => setLang('kz')} className={`font-bold transition-colors ${lang === 'kz' ? 'text-blue-600' : 'hover:text-slate-800'}`}>KZ</button>
+                    <button onClick={() => setLang('kz')} className={`font-bold transition-colors ${lang === 'kz' ? 'text-blue-600 dark:text-blue-400' : 'hover:text-slate-800 dark:hover:text-slate-200'}`}>KZ</button>
                  </div>
              </div>
           </div>
@@ -313,7 +313,7 @@ export default function App() {
         <div className="mt-auto pt-6 border-t border-slate-400/20 flex flex-col gap-4">
           {user && (
             <div className="flex flex-col gap-2 relative">
-               <div className="text-xs font-semibold px-2 truncate text-slate-600" title={user.email}>{user.email}</div>
+               <div className="text-xs font-semibold px-2 truncate text-slate-600 dark:text-slate-400" title={user.email}>{user.email}</div>
                <button onClick={logout} className="flex items-center gap-2 px-3 py-2 text-xs font-bold bg-rose-500/10 text-rose-600 rounded-lg hover:bg-rose-500/20 transition-colors">
                   <LogOut className="w-3 h-3" /> Выйти
                </button>
@@ -323,7 +323,7 @@ export default function App() {
           <div className="flex items-center justify-between px-2 gap-2">
             <button
                onClick={toggleDarkMode}
-               className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
+               className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
                title={darkMode ? "Светлая тема" : "Темная тема"}
             >
                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -331,13 +331,13 @@ export default function App() {
             <div className="flex bg-white/30 dark:bg-slate-800/30 rounded-lg p-1 border border-white/50 dark:border-slate-700/50 flex-1 justify-center">
               <button 
                 onClick={() => setLang('ru')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'ru' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'ru' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-slate-200 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
               >
                 RU
               </button>
               <button 
                 onClick={() => setLang('kz')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'kz' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'kz' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-slate-200 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
               >
                 KZ
               </button>
@@ -353,7 +353,7 @@ export default function App() {
              {activeTab === 'dashboard' && <DashboardView key="dashboard" txt={txt} planData={planData} stats={dashboardStats} />}
              {activeTab === 'plan' && <PlanView key="plan" txt={txt} planData={planData} user={user} setPlanData={setPlanData} onSelectSpec={(idx) => { setSelectedSpecIndex(idx); setActiveTab('spec'); }} />}
              {activeTab === 'spec' && <SpecView key="spec" txt={txt} lang={lang} planData={planData} selectedSpecIndex={selectedSpecIndex} setSelectedSpecIndex={setSelectedSpecIndex} />}
-             {activeTab === 'history' && <HistoryView key="history" historyData={historyData} txt={txt} isAdmin={isAdmin} user={user} />}
+             {activeTab === 'history' && <HistoryView historyData={historyData} txt={txt} isAdmin={isAdmin} user={user} />}
              {activeTab === 'structure' && <StructureView key="structure" txt={txt} />}
              {activeTab === 'initiators' && <InitiatorsView key="initiators" txt={txt} planData={planData} />}
              {activeTab === 'cabinet' && <CabinetView key="cabinet" user={user} />}
@@ -594,9 +594,9 @@ function InitiatorsView({ txt, planData }: { txt: any, planData: ProcurementPlan
             </thead>
             <tbody>
               {initiatorStatsData.map((init, i) => (
-                 <tr key={i} className="border-b border-slate-100 hover:bg-slate-50/50">
+                 <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 dark:hover:bg-slate-900/50">
                     <td className="py-3 px-4 font-medium max-w-sm truncate" title={init.name}>{init.name}</td>
-                    <td className="py-3 px-4 font-bold text-slate-700">{init.count}</td>
+                    <td className="py-3 px-4 font-bold text-slate-700 dark:text-slate-300">{init.count}</td>
                     <td className="py-3 px-4 text-emerald-600 font-bold tracking-tight bg-emerald-50/30">
                        {init.sum.toLocaleString('ru-RU')} ₸
                     </td>
@@ -605,7 +605,7 @@ function InitiatorsView({ txt, planData }: { txt: any, planData: ProcurementPlan
             </tbody>
           </table>
           {initiatorStatsData.length === 0 && (
-             <div className="p-4 text-center text-slate-500 opacity-60 font-medium">Нет данных об инициаторах</div>
+             <div className="p-4 text-center text-slate-500 dark:text-slate-400 opacity-60 font-medium">Нет данных об инициаторах</div>
           )}
         </div>
       </div>
@@ -711,7 +711,7 @@ function StructureView({ txt }: { txt: any, key?: string }) {
       <div className="flex flex-col">
         <div 
           onClick={() => hasChildren && setIsExpanded(!isExpanded)}
-          className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors cursor-pointer hover:bg-white/40 ${level === 0 ? 'font-bold text-slate-800' : 'text-slate-600 text-sm'}`}
+          className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors cursor-pointer hover:bg-white/40 ${level === 0 ? 'font-bold text-slate-800 dark:text-slate-200' : 'text-slate-600 dark:text-slate-400 text-sm'}`}
           style={{ paddingLeft: `${level * 24 + 12}px` }}
         >
           <div className="w-5 h-5 flex items-center justify-center shrink-0">
@@ -719,7 +719,7 @@ function StructureView({ txt }: { txt: any, key?: string }) {
               isExpanded ? <ChevronDown className="w-4 h-4 opacity-50" /> : <ChevronRight className="w-4 h-4 opacity-50" />
             ) : null}
           </div>
-          <Icon className={`w-4 h-4 shrink-0 ${node.type === 'person' ? 'text-blue-500' : 'text-slate-500'}`} />
+          <Icon className={`w-4 h-4 shrink-0 ${node.type === 'person' ? 'text-blue-500' : 'text-slate-500 dark:text-slate-400'}`} />
           <span className="truncate">{node.name}</span>
         </div>
         {hasChildren && isExpanded && (
@@ -859,53 +859,54 @@ function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: a
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        <div className="flex flex-col gap-6 glass-card p-6 border-blue-100 bg-blue-50/10">
-          <h3 className="font-bold text-lg text-blue-800 border-b pb-2">Основные показатели</h3>
-          <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-6 glass-card p-6 border-blue-100 bg-blue-50 dark:bg-blue-900/20 shadow-sm h-min">
+          <h3 className="font-bold text-lg text-blue-800 dark:text-blue-300 border-b border-blue-200 dark:border-blue-800/50 pb-2">Основные показатели (Сводные)</h3>
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="text-xs font-bold opacity-60 mb-1 block">{txt.totalBudget}</label>
-              <input type="number" className="glass-input w-full p-2" value={formData.totalBudget ?? ''} onChange={e => handleChange('totalBudget', e.target.value)} />
+              <label className="text-xs font-bold opacity-60 mb-2 block">ОБЩИЙ БЮДЖЕТ (ТЕНГЕ)</label>
+              <input type="number" className="glass-input w-full p-3 font-semibold" value={formData.totalBudget ?? ''} onChange={e => handleChange('totalBudget', e.target.value)} />
             </div>
             <div>
-              <label className="text-xs font-bold opacity-60 mb-1 block">{txt.savings}</label>
-              <input type="number" className="glass-input w-full p-2" value={formData.savings ?? ''} onChange={e => handleChange('savings', e.target.value)} />
-            </div>
-            <div>
-              <label className="text-xs font-bold opacity-60 mb-1 block">{txt.executionStatus}</label>
-              <input type="number" className="glass-input w-full p-2" value={formData.executionStatus ?? ''} onChange={e => handleChange('executionStatus', e.target.value)} />
+              <label className="text-xs font-bold opacity-60 mb-2 block">СОХРАНЕННАЯ ЭКОНОМИЯ</label>
+              <input type="number" className="glass-input w-full p-3 font-semibold text-emerald-600 dark:text-emerald-400" value={formData.savings ?? ''} onChange={e => handleChange('savings', e.target.value)} />
             </div>
           </div>
           
-          <h3 className="font-bold text-lg text-emerald-800 border-b pb-2 mt-4">Способы закупок</h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-               <label className="text-xs font-bold opacity-60 mb-1 block">Тендер</label>
-               <input type="number" className="glass-input w-full p-2" value={formData.methodTender ?? ''} onChange={e => handleChange('methodTender', e.target.value)} />
-            </div>
-            <div>
-               <label className="text-xs font-bold opacity-60 mb-1 block">ЗЦП</label>
-               <input type="number" className="glass-input w-full p-2" value={formData.methodZCP ?? ''} onChange={e => handleChange('methodZCP', e.target.value)} />
-            </div>
-            <div>
-               <label className="text-xs font-bold opacity-60 mb-1 block">Один источник</label>
-               <input type="number" className="glass-input w-full p-2" value={formData.methodOI ?? ''} onChange={e => handleChange('methodOI', e.target.value)} />
-            </div>
+          <h3 className="font-bold text-lg text-emerald-800 dark:text-emerald-400 border-b border-emerald-200 dark:border-emerald-800/50 pb-2 mt-4 flex items-center gap-2">
+             <Building2 className="w-5 h-5 flex-shrink-0" />
+             Добавление поставщиков (Реестр)
+          </h3>
+          <div className="flex gap-2 items-center">
+             <input type="text" placeholder="БИН или Наименование компании..." className="glass-input w-full p-3 font-medium text-sm" />
+             <button className="bg-emerald-500 hover:bg-emerald-600 text-white p-3 rounded-xl shadow-lg transition-colors flex-shrink-0 font-bold whitespace-nowrap" onClick={() => alert('Функция добавления поставщиков будет интегрирована с АСТАНА-1 в следующем обновлении.')}>
+               + В реестр
+             </button>
           </div>
         </div>
 
-        <div className="flex flex-col gap-6 glass-card p-6 border-indigo-100 bg-indigo-50/10">
-          <h3 className="font-bold text-lg text-indigo-800 border-b pb-2">Исполнение по кварталам (План/Факт)</h3>
-          <div className="space-y-4">
+        <div className="flex flex-col gap-6 glass-card p-6 border-indigo-100 dark:border-indigo-800/30 bg-indigo-50/50 dark:bg-indigo-900/10 h-min">
+          <h3 className="font-bold text-lg text-indigo-800 dark:text-indigo-400 border-b border-indigo-200 dark:border-indigo-800/50 pb-2">Исполнение по кварталам</h3>
+          <div className="space-y-6">
             {[1, 2, 3, 4].map(q => (
-              <div key={q} className="flex gap-4 items-end">
-                <div className="w-16 font-bold text-sm mb-2">{q}-й кв.</div>
-                <div className="flex-1">
-                   <label className="text-[10px] font-bold opacity-50 uppercase">План</label>
-                   <input type="number" className="glass-input w-full p-2" value={formData[`q${q}Plan`] ?? ''} onChange={e => handleChange(`q${q}Plan`, e.target.value)} />
-                </div>
-                <div className="flex-1">
-                   <label className="text-[10px] font-bold opacity-50 uppercase">Факт</label>
-                   <input type="number" className="glass-input w-full p-2" value={formData[`q${q}Fact`] ?? ''} onChange={e => handleChange(`q${q}Fact`, e.target.value)} />
+              <div key={q} className="bg-white/40 dark:bg-slate-800/40 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800/30 shadow-sm relative pt-6">
+                <div className="absolute top-0 left-0 bg-indigo-600 text-white text-[10px] font-bold px-3 py-1 rounded-br-lg rounded-tl-xl shadow-sm uppercase tracking-wider">{q}-й квартал</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                     <label className="text-[10px] font-bold opacity-60 uppercase mb-1 block">План по сумме</label>
+                     <input type="number" className="glass-input w-full p-2 text-sm font-medium" value={formData[`q${q}Plan`] ?? ''} onChange={e => handleChange(`q${q}Plan`, e.target.value)} />
+                  </div>
+                  <div>
+                     <label className="text-[10px] font-bold opacity-60 uppercase mb-1 block">Потенциальная экономия</label>
+                     <input type="number" className="glass-input w-full p-2 text-sm font-medium text-emerald-600 dark:text-emerald-400" value={formData[`q${q}Fact`] ?? ''} onChange={e => handleChange(`q${q}Fact`, e.target.value)} />
+                  </div>
+                  <div>
+                     <label className="text-[10px] font-bold opacity-60 uppercase mb-1 block">Выполнено маркетинга</label>
+                     <input type="number" className="glass-input w-full p-2 text-sm font-medium text-blue-600 dark:text-blue-400" value={formData[`q${q}Marketing`] ?? ''} onChange={e => handleChange(`q${q}Marketing`, e.target.value)} />
+                  </div>
+                  <div>
+                     <label className="text-[10px] font-bold opacity-60 uppercase mb-1 block">Выполнено приказов</label>
+                     <input type="number" className="glass-input w-full p-2 text-sm font-medium text-amber-600 dark:text-amber-400" value={formData[`q${q}Orders`] ?? ''} onChange={e => handleChange(`q${q}Orders`, e.target.value)} />
+                  </div>
                 </div>
               </div>
             ))}
@@ -927,7 +928,7 @@ function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: a
         <h3 className="font-bold text-xl text-rose-800 mb-6 flex items-center gap-3">
             <Archive className="w-6 h-6" /> Управление данными (Архивация)
         </h3>
-        <p className="text-sm text-slate-500 mb-8 italic">Данные будут перемещены в корзину, где вы сможете просмотреть их или восстановить.</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 italic">Данные будут перемещены в корзину, где вы сможете просмотреть их или восстановить.</p>
         
         <div className="flex flex-wrap gap-6">
             <button 
@@ -971,7 +972,7 @@ function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: a
   );
 }
 
-function HistoryView({ historyData, txt, isAdmin, user, key }: { historyData: any[], txt: any, isAdmin: boolean, user: any, key?: string }) {
+function HistoryView({ historyData, txt, isAdmin, user }: { historyData: any[], txt: any, isAdmin: boolean, user: any }) {
   const handleDeleteItem = async (record: any) => {
     if (!isAdmin) return;
     if (!confirm("Переместить эту запись в корзину?")) return;
@@ -1015,7 +1016,7 @@ function HistoryView({ historyData, txt, isAdmin, user, key }: { historyData: an
                   )}
                   <div className="flex justify-between items-start mb-3 pr-10">
                      <div>
-                       <h3 className="font-bold text-slate-800 text-lg">Загрузка плана</h3>
+                       <h3 className="font-bold text-slate-800 dark:text-slate-200 text-lg">Загрузка плана</h3>
                        <p className="text-xs font-semibold opacity-60">
                          {record.createdAt?.toDate ? format(record.createdAt.toDate(), 'dd.MM.yyyy HH:mm:ss') : 'Неизвестно'}
                        </p>
@@ -1116,10 +1117,10 @@ function TrashView({ trashData, txt, isAdmin }: { trashData: { plan: any[], hist
     >
       <header className="flex justify-between items-center mb-4 flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-800 flex items-center gap-3">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-200 flex items-center gap-3">
              <Archive className="w-8 h-8 text-rose-500" /> {txt.trash || 'Корзина / Архив'}
           </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium italic">Место для временного хранения удаленных данных</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium italic">Место для временного хранения удаленных данных</p>
         </div>
         <div className="flex items-center gap-4">
           <button 
@@ -1129,16 +1130,16 @@ function TrashView({ trashData, txt, isAdmin }: { trashData: { plan: any[], hist
           >
             <XCircle className="w-4 h-4" /> Очистить всё
           </button>
-          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 shadow-inner">
              <button 
                onClick={() => setActiveSubTab('plan')}
-               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'plan' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'plan' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
              >
                 План закупок ({trashData.plan.length})
              </button>
              <button 
                onClick={() => setActiveSubTab('history')}
-               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'history' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'history' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
              >
                 История ({trashData.history.length})
              </button>
@@ -1153,8 +1154,8 @@ function TrashView({ trashData, txt, isAdmin }: { trashData: { plan: any[], hist
                  <div key={item.id} className="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center group hover:border-rose-300 transition-all shadow-sm">
                     <div className="flex flex-col gap-1 overflow-hidden pr-4">
                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Удалено {item.deletedAt?.toDate ? format(item.deletedAt.toDate(), 'dd.MM.yyyy HH:mm') : '-'}</span>
-                       <h4 className="font-bold text-slate-800 truncate" title={item.nameRu}>{item.nameRu}</h4>
-                       <span className="text-xs text-slate-500 font-medium">№ п/п: {item.rowNum} | Бюджет: {item.totalSumApproB?.toLocaleString('ru-RU')} ₸</span>
+                       <h4 className="font-bold text-slate-800 dark:text-slate-200 truncate" title={item.nameRu}>{item.nameRu}</h4>
+                       <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">№ п/п: {item.rowNum} | Бюджет: {item.totalSumApproB?.toLocaleString('ru-RU')} ₸</span>
                     </div>
                     <div className="flex gap-2">
                        <button 
@@ -1184,8 +1185,8 @@ function TrashView({ trashData, txt, isAdmin }: { trashData: { plan: any[], hist
                  <div key={record.id} className="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center group hover:border-rose-300 transition-all shadow-sm">
                     <div className="flex flex-col gap-1 overflow-hidden pr-4">
                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Удалено {record.deletedAt?.toDate ? format(record.deletedAt.toDate(), 'dd.MM.yyyy HH:mm') : '-'}</span>
-                       <h4 className="font-bold text-slate-800">Загрузка плана от {record.createdAt?.toDate ? format(record.createdAt.toDate(), 'dd.MM.yyyy') : '-'}</h4>
-                       <span className="text-xs text-slate-500 font-medium">{record.changesSummary}</span>
+                       <h4 className="font-bold text-slate-800 dark:text-slate-200">Загрузка плана от {record.createdAt?.toDate ? format(record.createdAt.toDate(), 'dd.MM.yyyy') : '-'}</h4>
+                       <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{record.changesSummary}</span>
                     </div>
                     <div className="flex gap-2">
                        <button 
@@ -1397,8 +1398,8 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
       {previewDiff && (
         <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col gap-6">
-            <h3 className="text-2xl font-bold text-slate-800">Предпросмотр загрузки</h3>
-            <p className="text-slate-600 text-sm">
+            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Предпросмотр загрузки</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
               В новом плане <strong>{previewDiff.parsed.length}</strong> позиций. Вот что изменится в базе:
             </p>
             <div className="flex flex-col gap-2">
@@ -1406,7 +1407,7 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
                  <span className="font-medium">Новых позиций:</span>
                  <span className="font-bold text-lg">+{previewDiff.added}</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-blue-50 text-blue-700 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg">
                  <span className="font-medium">Совпадений (Обновлено):</span>
                  <span className="font-bold text-lg">~{previewDiff.updated}</span>
               </div>
@@ -1419,7 +1420,7 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
               <button 
                 disabled={isProcessing}
                 onClick={() => setPreviewDiff(null)}
-                className="px-5 py-2.5 rounded-xl font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+                className="px-5 py-2.5 rounded-xl font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
               >
                 Отмена
               </button>
@@ -1439,12 +1440,12 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
       <div className="p-8 pb-4 flex justify-between items-center shrink-0 flex-wrap gap-4">
          <div className="flex items-center gap-6">
            <h1 className="text-3xl font-bold tracking-tight">{txt.plan}</h1>
-           <div className="flex bg-slate-100 p-1 rounded-xl shadow-inner border border-slate-200">
+           <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl shadow-inner border border-slate-200">
              {menuCategories.map(cat => (
                <button 
                  key={cat.id}
                  onClick={() => setActiveCategory(cat.id as any)}
-                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                >
                  {cat.name}
                </button>
@@ -1478,29 +1479,29 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
                <tr className="uppercase tracking-wider">
                  <th className="p-3 bg-indigo-50 text-indigo-900 font-bold sticky left-0 z-10 text-center">Создать</th>
                  <th className="p-3">№ п/п</th>
-                 <th className="p-3 bg-blue-50/20">Тип пункта плана</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Тип пункта плана</th>
                  <th className="p-3">Вид предмета</th>
-                 <th className="p-3 bg-blue-50/20">Код товара (СТРУ)</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Код товара (СТРУ)</th>
                  <th className="p-3">Наименование (KZ)</th>
-                 <th className="p-3 bg-blue-50/20">Наименование (RU)</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Наименование (RU)</th>
                  <th className="p-3">Краткая хар-ка (KZ)</th>
-                 <th className="p-3 bg-blue-50/20">Краткая хар-ка (RU)</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Краткая хар-ка (RU)</th>
                  <th className="p-3">Доп. хар-ка (KZ)</th>
-                 <th className="p-3 bg-blue-50/20">Доп. хар-ка (RU)</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Доп. хар-ка (RU)</th>
                  <th className="p-3">Наименование (Бюджет)</th>
-                 <th className="p-3 bg-blue-50/20">Способ закупок</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Способ закупок</th>
                  <th className="p-3">Ед. изм</th>
-                 <th className="p-3 bg-blue-50/20">Кол-во</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Кол-во</th>
                  <th className="p-3">Цена за ед (без НДС)</th>
-                 <th className="p-3 bg-blue-50/20">Общая сумма</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Общая сумма</th>
                  <th className="p-3">Сумма 2026</th>
-                 <th className="p-3 bg-blue-50/20">Срок закупок(мес)</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Срок закупок(мес)</th>
                  <th className="p-3">Срок поставки (KZ)</th>
-                 <th className="p-3 bg-blue-50/20">Срок поставки (RU)</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Срок поставки (RU)</th>
                  <th className="p-3">КАТО</th>
-                 <th className="p-3 bg-blue-50/20">Место поставки (KZ)</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Место поставки (KZ)</th>
                  <th className="p-3">Место поставки (RU)</th>
-                 <th className="p-3 bg-blue-50/20">Аванс %</th>
+                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Аванс %</th>
                  <th className="p-3">Инициатор</th>
                </tr>
              </thead>
@@ -1526,35 +1527,35 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
                      </div>
                    </td>
                    <td className="p-3 font-mono font-medium pl-4">{item.rowNum}</td>
-                   <td className="p-3 max-w-[200px] truncate bg-blue-50/20" title={item.type}>{item.type}</td>
+                   <td className="p-3 max-w-[200px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.type}>{item.type}</td>
                    <td className="p-3 max-w-[100px] truncate" title={item.itemKind}>{item.itemKind}</td>
-                   <td className="p-3 font-mono text-blue-600 bg-blue-50/20">{item.code}</td>
+                   <td className="p-3 font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20/20">{item.code}</td>
                    <td className="p-3 max-w-[200px] truncate" title={item.nameKz}>{item.nameKz}</td>
-                   <td className="p-3 max-w-[200px] truncate bg-blue-50/20" title={item.nameRu}>{item.nameRu}</td>
+                   <td className="p-3 max-w-[200px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.nameRu}>{item.nameRu}</td>
                    <td className="p-3 max-w-[200px] truncate" title={item.descKz}>{item.descKz}</td>
-                   <td className="p-3 max-w-[200px] truncate bg-blue-50/20" title={item.descRu}>{item.descRu}</td>
+                   <td className="p-3 max-w-[200px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.descRu}>{item.descRu}</td>
                    <td className="p-3 max-w-[250px] truncate" title={item.extraDescKz}>{item.extraDescKz}</td>
-                   <td className="p-3 max-w-[250px] truncate bg-blue-50/20" title={item.extraDescRu}>{item.extraDescRu}</td>
+                   <td className="p-3 max-w-[250px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.extraDescRu}>{item.extraDescRu}</td>
                    <td className="p-3 max-w-[200px] truncate" title={item.budgetRuName}>{item.budgetRuName}</td>
-                   <td className="p-3 font-semibold bg-blue-50/20">{item.procurementMethod}</td>
+                   <td className="p-3 font-semibold bg-blue-50 dark:bg-blue-900/20/20">{item.procurementMethod}</td>
                    <td className="p-3">{item.unit}</td>
-                   <td className="p-3 text-right font-mono bg-blue-50/20">{Number(item.quantity).toLocaleString()}</td>
+                   <td className="p-3 text-right font-mono bg-blue-50 dark:bg-blue-900/20/20">{Number(item.quantity).toLocaleString()}</td>
                    <td className="p-3 text-right font-mono">{Number(item.unitPrice).toLocaleString()}</td>
-                   <td className="p-3 text-right font-mono font-semibold bg-blue-50/20">{Number(item.totalSumApproB).toLocaleString()}</td>
+                   <td className="p-3 text-right font-mono font-semibold bg-blue-50 dark:bg-blue-900/20/20">{Number(item.totalSumApproB).toLocaleString()}</td>
                    <td className="p-3 text-right font-mono">{Number(item.sum2026).toLocaleString()}</td>
-                   <td className="p-3 bg-blue-50/20">{item.month}</td>
+                   <td className="p-3 bg-blue-50 dark:bg-blue-900/20/20">{item.month}</td>
                    <td className="p-3 max-w-[150px] truncate" title={item.deliveryPeriodKz}>{item.deliveryPeriodKz}</td>
-                   <td className="p-3 max-w-[150px] truncate bg-blue-50/20" title={item.deliveryPeriodRu}>{item.deliveryPeriodRu}</td>
+                   <td className="p-3 max-w-[150px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.deliveryPeriodRu}>{item.deliveryPeriodRu}</td>
                    <td className="p-3 font-mono">{item.kato}</td>
-                   <td className="p-3 max-w-[200px] truncate bg-blue-50/20" title={item.deliveryPlaceKz}>{item.deliveryPlaceKz}</td>
+                   <td className="p-3 max-w-[200px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.deliveryPlaceKz}>{item.deliveryPlaceKz}</td>
                    <td className="p-3 max-w-[200px] truncate" title={item.deliveryPlaceRu}>{item.deliveryPlaceRu}</td>
-                   <td className="p-3 text-center bg-blue-50/20">{item.advancePercent}</td>
+                   <td className="p-3 text-center bg-blue-50 dark:bg-blue-900/20/20">{item.advancePercent}</td>
                    <td className="p-3 max-w-[150px] truncate" title={item.initiator}>{item.initiator}</td>
                  </tr>
                ))}
                {filteredPlan.length === 0 && (
                  <tr>
-                   <td colSpan={25} className="p-8 text-center text-slate-500 font-medium">
+                   <td colSpan={25} className="p-8 text-center text-slate-500 dark:text-slate-400 font-medium">
                       Нет данных или не найдено совпадений
                    </td>
                  </tr>
@@ -1697,14 +1698,14 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
         <div className="flex justify-between items-center">
            <h1 className="text-3xl font-bold tracking-tight">{txt.spec}</h1>
            <div className="flex gap-4">
-             <button onClick={handleExportWord} className="glass-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-blue-600 hover:bg-blue-50/50">
+             <button onClick={handleExportWord} className="glass-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20/50">
                <Download className="w-5 h-5" /> {txt.exportWord}
              </button>
            </div>
         </div>
 
         {/* Settings for generating document */}
-        <div className="glass-card p-6 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border-blue-200/50 relative overflow-hidden shadow-sm">
+        <div className="glass-card p-6 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border-blue-200 dark:border-blue-800/50/50 relative overflow-hidden shadow-sm">
            <div className="absolute right-0 bottom-0 opacity-5 mix-blend-overlay pointer-events-none">
              <Settings className="w-64 h-64 translate-x-12 translate-y-12" />
            </div>
@@ -1717,7 +1718,7 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
                  <button 
                    key={cat.id}
                    onClick={() => setActiveCategory(cat.id as any)}
-                   className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                   className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                  >
                    {cat.name}
                  </button>
@@ -1727,7 +1728,7 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
              <select 
                value={selectedSpecIndex} 
                onChange={e => setSelectedSpecIndex(Number(e.target.value))}
-               className="glass-input px-3 py-2 text-sm font-medium w-full text-slate-800 bg-white/70 cursor-pointer outline-none hover:bg-white/90 transition-colors" 
+               className="glass-input px-3 py-2 text-sm font-medium w-full text-slate-800 dark:text-slate-200 bg-white/70 cursor-pointer outline-none hover:bg-white/90 transition-colors" 
              >
                <option value={-1} disabled>-- Выберите из категории {activeCategory === 'all' ? 'Все' : menuCategories.find(c => c.id === activeCategory)?.name} --</option>
                {filteredOptions.length === 0 ? (
@@ -1742,17 +1743,17 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
            
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
               <div className="flex flex-col gap-2">
-                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">{txt.approverFields}</h3>
+                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">{txt.approverFields}</h3>
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={approverPosition} onChange={e => setApproverPosition(e.target.value)} placeholder={txt.position} />
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={approverFIO} onChange={e => setApproverFIO(e.target.value)} placeholder={txt.fio} />
               </div>
               <div className="flex flex-col gap-2">
-                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">{txt.developerFields}</h3>
+                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">{txt.developerFields}</h3>
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={developerPosition} onChange={e => setDeveloperPosition(e.target.value)} placeholder={txt.position} />
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={developerFIO} onChange={e => setDeveloperFIO(e.target.value)} placeholder={txt.fio} />
               </div>
               <div className="flex flex-col gap-2">
-                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-1">{txt.extraFields}</h3>
+                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">{txt.extraFields}</h3>
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)} placeholder={txt.paymentTermsPlaceholder} />
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={warranty} onChange={e => setWarranty(e.target.value)} placeholder={txt.warrantyPlaceholder} />
                  <textarea className="glass-input w-full text-sm p-2.5 font-medium resize-none" value={reqDescStr} onChange={e => setReqDescStr(e.target.value)} placeholder={txt.reqDescPlaceholder} rows={2} />
@@ -1917,7 +1918,7 @@ function CabinetView({ user }: { user: any, key?: string }) {
           </div>
           <div>
             <h2 className="text-3xl font-bold dark:text-white">Панель Инициатора (Мои заявки)</h2>
-            <p className="text-slate-500 font-medium">Подача заявок на включение в план напрямую</p>
+            <p className="text-slate-500 dark:text-slate-400 font-medium">Подача заявок на включение в план напрямую</p>
           </div>
        </div>
 
@@ -1955,7 +1956,7 @@ function CabinetView({ user }: { user: any, key?: string }) {
           </h4>
           <div className="flex flex-col gap-3">
              {requests.length === 0 ? (
-                <div className="text-slate-500">Заявок пока нет.</div>
+                <div className="text-slate-500 dark:text-slate-400">Заявок пока нет.</div>
              ) : (
                 requests.map(r => (
                   <div key={r.id} className="bg-white/40 dark:bg-slate-800/40 p-5 rounded-xl border border-white/30 dark:border-slate-700/50 flex flex-col gap-2 dark:text-slate-200">
@@ -1985,12 +1986,12 @@ function WikiView() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 h-full flex flex-col pt-12 overflow-y-auto w-full">
        <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm border border-blue-200 dark:border-blue-800">
+          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm border border-blue-200 dark:border-blue-800/50 dark:border-blue-800">
              <BookOpen className="w-8 h-8" />
           </div>
           <div>
             <h2 className="text-3xl font-bold dark:text-white">База Знаний (Вики)</h2>
-            <p className="text-slate-500 font-medium">Регламенты, инструкции и FAQ для всех сотрудников DTJ</p>
+            <p className="text-slate-500 dark:text-slate-400 font-medium">Регламенты, инструкции и FAQ для всех сотрудников DTJ</p>
           </div>
        </div>
 
@@ -2039,8 +2040,17 @@ function ItemDiscussionModal({ item, user, onClose, planData }: { item: Procurem
 
   useEffect(() => {
     if (!itemId) return;
-    const q = query(collection(db, 'planComments'), where('itemId', '==', itemId), orderBy('createdAt', 'asc'));
-    const unsub = onSnapshot(q, (snap) => setMessages(snap.docs.map(d => ({id: d.id, ...d.data()}))));
+    const q = query(collection(db, 'planComments'), where('itemId', '==', itemId));
+    const unsub = onSnapshot(q, (snap) => {
+      const data = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      // Sort client-side to avoid requiring composite indexes in Firestore
+      data.sort((a: any, b: any) => {
+        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        return timeA - timeB; // Ascending
+      });
+      setMessages(data);
+    });
     return () => unsub();
   }, [itemId]);
 
@@ -2115,18 +2125,18 @@ function ItemDiscussionModal({ item, user, onClose, planData }: { item: Procurem
          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
          className="w-[450px] bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800 relative"
        >
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start bg-slate-50 dark:bg-slate-800/50">
+          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start bg-slate-50 dark:bg-slate-900 dark:bg-slate-800/50">
              <div>
                 <h3 className="font-bold text-lg dark:text-white flex items-center gap-2"><MessageSquare className="w-5 h-5 text-indigo-500" /> Обсуждение</h3>
                 <p className="text-xs opacity-60 mt-1 max-w-[300px] truncate" title={item.nameRu}>{item.nameRu}</p>
                 <div className="text-[10px] uppercase font-bold text-indigo-600 mt-2 bg-indigo-100 inline-block px-2 py-0.5 rounded">Лот № {item.rowNum}</div>
              </div>
-             <button onClick={onClose} className="p-2 bg-slate-200 dark:bg-slate-700 rounded-full hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
-                <XCircle className="w-5 h-5 text-slate-500 dark:text-slate-300" />
+             <button onClick={onClose} className="p-2 bg-slate-200 dark:bg-slate-800 dark:bg-slate-700 rounded-full hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                <XCircle className="w-5 h-5 text-slate-500 dark:text-slate-400 dark:text-slate-300" />
              </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-900/50">
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-slate-50 dark:bg-slate-900/50 dark:bg-slate-900/50">
              {messages.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50">
                    <MessageSquare className="w-12 h-12 mb-3 dark:text-slate-400" />
@@ -2160,7 +2170,7 @@ function ItemDiscussionModal({ item, user, onClose, planData }: { item: Procurem
                         <button
                            key={m}
                            type="button"
-                           className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700/50 text-sm transition-colors dark:text-white border-b border-slate-100 dark:border-slate-700/30 last:border-0 truncate"
+                           className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-700/50 text-sm transition-colors dark:text-white border-b border-slate-100 dark:border-slate-700/30 last:border-0 truncate"
                            onClick={() => insertMention(m)}
                         >
                            {m}
