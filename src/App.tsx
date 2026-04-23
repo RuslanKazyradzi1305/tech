@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   LayoutDashboard, FileSpreadsheet, FileText, Search, Download, Settings,
   Globe, Box, Upload, FileDown, PieChart as PieChartIcon, History, LogOut, LogIn,
   Network, ChevronRight, ChevronDown, User, Home, Building2, Users,
-  Trash2, AlertTriangle, Archive, RefreshCw, XCircle, Save, Moon, Sun, BookOpen, Briefcase, WifiOff, HelpCircle, Send, MessageSquare
+  Trash2, AlertTriangle, Archive, RefreshCw, XCircle, Save, Moon, Sun, BookOpen, Briefcase, WifiOff, HelpCircle, Send, MessageSquare, List
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -24,7 +24,7 @@ import { mockPlan, t, ProcurementPlanItem } from './data';
 import { auth, db, loginWithGoogle, logout } from './firebase';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'plan' | 'spec' | 'history' | 'structure' | 'initiators' | 'cabinet' | 'suppliers' | 'wiki' | 'trash'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'plan' | 'spec' | 'history' | 'structure' | 'initiators' | 'cabinet' | 'wiki' | 'trash'>('dashboard');
   const [selectedSpecIndex, setSelectedSpecIndex] = useState<number>(0);
   const [lang, setLang] = useState<'ru' | 'kz'>('ru');
   const [planData, setPlanData] = useState<ProcurementPlanItem[]>([]);
@@ -274,14 +274,6 @@ export default function App() {
           <div className="my-1 border-t border-slate-300/30 dark:border-slate-600/30"></div>
 
           <button 
-            onClick={() => setActiveTab('suppliers')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'suppliers' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
-          >
-            <Briefcase className="w-5 h-5 opacity-70 shrink-0" /> 
-            <span className="leading-tight">Портал Поставщика</span>
-          </button>
-
-          <button 
             onClick={() => setActiveTab('wiki')}
             className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'wiki' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
           >
@@ -365,7 +357,6 @@ export default function App() {
              {activeTab === 'structure' && <StructureView key="structure" txt={txt} />}
              {activeTab === 'initiators' && <InitiatorsView key="initiators" txt={txt} planData={planData} />}
              {activeTab === 'cabinet' && <CabinetView key="cabinet" user={user} />}
-             {activeTab === 'suppliers' && <SupplierPortalView key="suppliers" />}
              {activeTab === 'wiki' && <WikiView key="wiki" />}
              {activeTab === 'trash' && <TrashView key="trash" trashData={trashData} txt={txt} isAdmin={isAdmin} />}
              {activeTab === ('admin' as any) && <AdminView key="admin" txt={txt} stats={dashboardStats} planData={planData} user={user} isAdmin={isAdmin} />}
@@ -1576,7 +1567,7 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
       {/* Item Discussion Modal */}
       <AnimatePresence>
         {discussItem && (
-          <ItemDiscussionModal item={discussItem} user={user} onClose={() => setDiscussItem(null)} />
+          <ItemDiscussionModal item={discussItem} user={user} planData={planData} onClose={() => setDiscussItem(null)} />
         )}
       </AnimatePresence>
     </motion.div>
@@ -1875,25 +1866,47 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
 }
 
 function CabinetView({ user }: { user: any, key?: string }) {
-  const [offlineReqs, setOfflineReqs] = useState<any[]>([]);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [name, setName] = useState('');
+  const [qty, setQty] = useState('');
+  const [unit, setUnit] = useState('');
+  const [price, setPrice] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isOnline = navigator.onLine;
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('offlineRequests');
-      if (stored) setOfflineReqs(JSON.parse(stored));
-    } catch {}
-  }, []);
+    const unsub = onSnapshot(collection(db, 'initiatorRequests'), (snap) => {
+       let docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+       docs.sort((a:any, b:any) => (b.createdAt?.toMillis() || Date.now()) - (a.createdAt?.toMillis() || Date.now()));
+       
+       const isAdmin = user?.email === 'kazyyev.chiefengineer@gmail.com';
+       if (!isAdmin) {
+           docs = docs.filter((d:any) => d.author === user?.email);
+       }
+       setRequests(docs);
+    });
+    return () => unsub();
+  }, [user]);
 
-  const addMockReq = () => {
-    const nr = { id: Date.now(), title: 'Новая оффлайн заявка', date: new Date().toLocaleDateString() };
-    const next = [...offlineReqs, nr];
-    setOfflineReqs(next);
-    localStorage.setItem('offlineRequests', JSON.stringify(next));
-    alert(isOnline ? 'Синхронизировано с базой!' : 'Нет сети! Заявка сохранена локально и будет отправлена при появлении интернета.');
-    if (isOnline) {
-       setTimeout(() => setOfflineReqs([]), 1000);
+  const handleSubmit = async () => {
+    if (!name.trim() || !qty.trim()) return;
+    setIsSubmitting(true);
+    try {
+       await setDoc(doc(collection(db, 'initiatorRequests')), {
+         name, 
+         quantity: qty, 
+         unit, 
+         price,
+         author: user?.email || 'Аноним',
+         status: 'В обработке',
+         createdAt: serverTimestamp()
+       });
+       setName(''); setQty(''); setUnit(''); setPrice('');
+    } catch(e) {
+       console.error(e);
+       alert('Ошибка при отправке');
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -1911,76 +1924,58 @@ function CabinetView({ user }: { user: any, key?: string }) {
        {!isOnline && (
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 p-4 rounded-xl flex items-center gap-3 mb-6 animate-pulse font-medium max-w-2xl">
              <WifiOff className="w-5 h-5 shrink-0" />
-             Нет интернета. Офлайн-режим активен (PWA). Ваши заявки сохраняются в кэше браузера.
+             Нет интернета. Офлайн-режим активен (PWA). Заявки не будут доставлены до появления сети.
           </div>
        )}
 
        <div className="glass-card max-w-2xl p-8 flex flex-col gap-4">
           <h3 className="font-bold text-lg border-b border-slate-200 dark:border-slate-700 pb-2 dark:text-white">Сформировать потребность (Zero Paper)</h3>
-          <p className="text-sm opacity-70 mb-4 dark:text-slate-300">Выберите товар или услугу из каталога, укажите количество, и мы передадим данные экономистам.</p>
+          <p className="text-sm opacity-70 mb-4 dark:text-slate-300">Укажите наименование, количество, цену и отправьте в обработку. Данные поступят экономистам напрямую.</p>
           
-          <input type="text" placeholder="Наименование (например, Реле РЭЛ-1М)" className="glass-input p-3" />
+          <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Наименование (например, Реле РЭЛ-1М)" className="glass-input p-3" />
           <div className="flex gap-4">
-            <input type="number" placeholder="Количество" className="glass-input p-3 w-1/3" />
-            <input type="text" placeholder="Ед. изм. (шт, кг)" className="glass-input p-3 w-1/3" />
-            <input type="text" placeholder="Примерная цена" className="glass-input p-3 w-1/3" />
+            <input type="text" value={qty} onChange={e => setQty(e.target.value)} placeholder="Количество" className="glass-input p-3 w-1/3" />
+            <input type="text" value={unit} onChange={e => setUnit(e.target.value)} placeholder="Ед. изм. (шт, кг)" className="glass-input p-3 w-1/3" />
+            <input type="text" value={price} onChange={e => setPrice(e.target.value)} placeholder="Примерная цена" className="glass-input p-3 w-1/3" />
           </div>
           
-          <button onClick={addMockReq} className="glass-btn-primary py-3 rounded-xl font-bold mt-4 shadow-lg shadow-blue-500/20">
-            {isOnline ? 'Отправить в обработку' : 'Сохранить локально (Offline)'}
+          <button 
+             disabled={isSubmitting || !name.trim() || !qty.trim()} 
+             onClick={handleSubmit} 
+             className="glass-btn-primary py-3 rounded-xl font-bold mt-4 shadow-lg shadow-blue-500/20 disabled:opacity-50"
+          >
+            {isSubmitting ? 'Отправка...' : 'Отправить в обработку'}
           </button>
        </div>
        
-       {offlineReqs.length > 0 && !isOnline && (
-         <div className="mt-8 max-w-2xl">
-            <h4 className="font-bold mb-4 opacity-70 dark:text-slate-300">Ожидают синхронизации ({offlineReqs.length})</h4>
-            <div className="flex flex-col gap-3">
-               {offlineReqs.map(r => (
-                 <div key={r.id} className="bg-white/40 dark:bg-slate-800/40 p-4 rounded-xl border border-white/30 dark:border-slate-700/50 flex justify-between items-center opacity-70 dark:text-slate-200">
-                    <span className="font-semibold">{r.title}</span>
-                    <span className="text-xs font-mono">{r.date}</span>
-                 </div>
-               ))}
-            </div>
-         </div>
-       )}
-    </motion.div>
-  )
-}
-
-function SupplierPortalView() {
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 h-full flex flex-col pt-12 overflow-y-auto w-full">
-       <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-600 dark:text-rose-400 shadow-sm border border-rose-200 dark:border-rose-800">
-             <Briefcase className="w-8 h-8" />
+       <div className="mt-12 max-w-2xl">
+          <h4 className="font-bold mb-4 opacity-70 dark:text-slate-300 flex items-center gap-2">
+             <List className="w-5 h-5" /> 
+             История моих заявок
+          </h4>
+          <div className="flex flex-col gap-3">
+             {requests.length === 0 ? (
+                <div className="text-slate-500">Заявок пока нет.</div>
+             ) : (
+                requests.map(r => (
+                  <div key={r.id} className="bg-white/40 dark:bg-slate-800/40 p-5 rounded-xl border border-white/30 dark:border-slate-700/50 flex flex-col gap-2 dark:text-slate-200">
+                     <div className="flex justify-between items-center">
+                        <span className="font-bold text-lg">{r.name}</span>
+                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${r.status === 'В обработке' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                           {r.status}
+                        </span>
+                     </div>
+                     <div className="text-sm opacity-70 flex gap-4">
+                        <span>Кол-во: {r.quantity} {r.unit}</span>
+                        {r.price && <span>Цена: {r.price}</span>}
+                     </div>
+                     <div className="text-xs font-mono opacity-50 mt-2">
+                        Отправлено: {r.createdAt ? new Date(r.createdAt.toMillis()).toLocaleString() : 'Только что'}
+                     </div>
+                  </div>
+                ))
+             )}
           </div>
-          <div>
-            <h2 className="text-3xl font-bold dark:text-white">Портал Поставщика (SRM)</h2>
-            <p className="text-slate-500 font-medium">Микро-кабинет для сбора прайс-листов и КП от рынка</p>
-          </div>
-       </div>
-
-       <div className="grid grid-cols-2 gap-8 max-w-4xl">
-         <div className="glass-card p-6 border-dashed border-2 hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer flex flex-col items-center justify-center h-[300px] text-center dark:border-slate-600">
-            <Upload className="w-12 h-12 text-slate-400 mb-4" />
-            <h3 className="font-bold text-lg mb-2 dark:text-white">Загрузить Коммерческое (КП)</h3>
-            <p className="text-sm text-slate-500 max-w-[250px]">Поставщики могут загрузить свои цены в формате PDF/Excel, и наш ИИ сам вытащит цены.</p>
-         </div>
-         
-         <div className="flex flex-col gap-4">
-            <h3 className="font-bold text-lg mb-2 dark:text-white">Текущие открытые сборы цен</h3>
-            {[1,2,3].map(i => (
-              <div key={i} className="glass-card p-4 hover:scale-[1.02] transition-transform cursor-pointer border border-white/50 dark:border-slate-700">
-                 <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-sm dark:text-white">Поставка трансформаторов</span>
-                    <span className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] px-2 py-1 rounded-full font-bold">Активно</span>
-                 </div>
-                 <p className="text-xs text-slate-500 mb-3">Ожидаем коммерческие предложения до конца недели.</p>
-                 <div className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">+ Загрузить ответ</div>
-              </div>
-            ))}
-         </div>
        </div>
     </motion.div>
   )
@@ -2024,10 +2019,23 @@ function WikiView() {
   )
 }
 
-function ItemDiscussionModal({ item, user, onClose }: { item: ProcurementPlanItem, user: any, onClose: () => void }) {
+function ItemDiscussionModal({ item, user, onClose, planData }: { item: ProcurementPlanItem, user: any, onClose: () => void, planData: ProcurementPlanItem[] }) {
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState('');
+  const [mentionSearch, setMentionSearch] = useState<string | null>(null);
+  const [mentionIndex, setMentionIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
   const itemId = `${item.rowNum}_${item.code}`.replace(/[^a-zA-Z0-9_]/g, '');
+
+  const mentionCandidates = useMemo(() => {
+     const s = new Set<string>();
+     s.add('kazyyev.chiefengineer@gmail.com');
+     planData.forEach(p => {
+        if (p.initiator) s.add(p.initiator.trim());
+     });
+     return Array.from(s).filter(Boolean);
+  }, [planData]);
 
   useEffect(() => {
     if (!itemId) return;
@@ -2036,11 +2044,40 @@ function ItemDiscussionModal({ item, user, onClose }: { item: ProcurementPlanIte
     return () => unsub();
   }, [itemId]);
 
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+     const val = e.target.value;
+     setText(val);
+     
+     const cursor = e.target.selectionStart || 0;
+     const beforeCursor = val.slice(0, cursor);
+     const match = beforeCursor.match(/@([a-zA-Zа-яА-Я0-9_.-]*)$/);
+     if (match) {
+        setMentionSearch(match[1]);
+        setMentionIndex(match.index !== undefined ? match.index : -1);
+     } else {
+        setMentionSearch(null);
+     }
+  };
+
+  const filteredMentions = mentionSearch !== null 
+     ? mentionCandidates.filter(m => m.toLowerCase().includes(mentionSearch.toLowerCase())).slice(0, 8)
+     : [];
+
+  const insertMention = (u: string) => {
+     const tag = u.replace(/\s+/g, '_');
+     const before = text.slice(0, mentionIndex);
+     const after = text.slice(mentionIndex + (mentionSearch?.length || 0) + 1);
+     setText(before + '@' + tag + ' ' + after);
+     setMentionSearch(null);
+     inputRef.current?.focus();
+  };
+
   const send = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) return;
     const txt = text;
     setText('');
+    setMentionSearch(null);
     try {
       await setDoc(doc(collection(db, 'planComments')), {
         itemId,
@@ -2054,6 +2091,21 @@ function ItemDiscussionModal({ item, user, onClose }: { item: ProcurementPlanIte
     }
   };
 
+  const renderComment = (msg: string, isMe: boolean) => {
+     if (!msg) return null;
+     const parts = msg.split(/(@\S+)/g);
+     return parts.map((part, i) => {
+        if (part.startsWith('@')) {
+           return (
+             <span key={i} className={`font-bold px-1 rounded mx-[1px] ${isMe ? 'text-indigo-100 bg-indigo-600' : 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/40 dark:text-indigo-300'}`}>
+                {part.replace(/_/g, ' ')}
+             </span>
+           );
+        }
+        return part;
+     });
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/20 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
        <motion.div 
@@ -2061,7 +2113,7 @@ function ItemDiscussionModal({ item, user, onClose }: { item: ProcurementPlanIte
          animate={{ x: 0, opacity: 1 }} 
          exit={{ x: 400, opacity: 0 }}
          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-         className="w-[450px] bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800"
+         className="w-[450px] bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800 relative"
        >
           <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start bg-slate-50 dark:bg-slate-800/50">
              <div>
@@ -2089,7 +2141,7 @@ function ItemDiscussionModal({ item, user, onClose }: { item: ProcurementPlanIte
                          {m.userName}
                        </span>
                        <div className={`px-4 py-2.5 max-w-[85%] rounded-2xl text-sm leading-relaxed shadow-sm ${isMe ? 'bg-indigo-500 text-white rounded-tr-sm' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-tl-sm dark:text-slate-200'}`}>
-                          {m.text}
+                          {renderComment(m.text, isMe)}
                        </div>
                     </div>
                   )
@@ -2097,18 +2149,41 @@ function ItemDiscussionModal({ item, user, onClose }: { item: ProcurementPlanIte
              )}
           </div>
 
-          <form onSubmit={send} className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex gap-3">
-             <input 
-               type="text" 
-               value={text}
-               onChange={e => setText(e.target.value)}
-               placeholder="Напишите комментарий..."
-               className="flex-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-400 transition-colors dark:text-white"
-             />
-             <button type="submit" disabled={!text.trim()} className="bg-indigo-500 hover:bg-indigo-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-colors">
-                <Send className="w-5 h-5 -ml-1" />
-             </button>
-          </form>
+          <div className="relative border-t border-slate-100 dark:border-slate-800">
+             <AnimatePresence>
+                {mentionSearch !== null && filteredMentions.length > 0 && (
+                  <motion.div 
+                     initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+                     className="absolute bottom-full left-4 mb-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl w-64 max-h-48 overflow-y-auto z-20"
+                  >
+                     {filteredMentions.map(m => (
+                        <button
+                           key={m}
+                           type="button"
+                           className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700/50 text-sm transition-colors dark:text-white border-b border-slate-100 dark:border-slate-700/30 last:border-0 truncate"
+                           onClick={() => insertMention(m)}
+                        >
+                           {m}
+                        </button>
+                     ))}
+                  </motion.div>
+                )}
+             </AnimatePresence>
+
+             <form onSubmit={send} className="p-4 bg-white dark:bg-slate-900 flex gap-3">
+                <input 
+                  ref={inputRef}
+                  type="text" 
+                  value={text}
+                  onChange={handleTextChange}
+                  placeholder="Напишите комментарий..."
+                  className="flex-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-400 transition-colors dark:text-white"
+                />
+                <button type="submit" disabled={!text.trim()} className="bg-indigo-500 hover:bg-indigo-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-colors shrink-0">
+                   <Send className="w-5 h-5 -ml-1" />
+                </button>
+             </form>
+          </div>
        </motion.div>
     </div>
   )
