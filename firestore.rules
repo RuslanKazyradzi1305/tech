@@ -67,5 +67,26 @@ service cloud.firestore {
       allow read: if isSignedIn() && resource.data.companyId == 'default';
       allow write: if isSignedIn() && isValidId(statsId) && incoming().companyId == 'default';
     }
+
+    match /planComments/{commentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    match /planTrash/{itemId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if false;
+      allow delete: if isSignedIn();
+    }
+
+    match /historyTrash/{historyId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if false;
+      allow delete: if isSignedIn();
+    }
   }
 }

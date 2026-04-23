@@ -8,14 +8,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   LayoutDashboard, FileSpreadsheet, FileText, Search, Download, Settings,
   Globe, Box, Upload, FileDown, PieChart as PieChartIcon, History, LogOut, LogIn,
-  Network, ChevronRight, ChevronDown, User, Home, Building2
+  Network, ChevronRight, ChevronDown, User, Home, Building2, Users,
+  Trash2, AlertTriangle, Archive, RefreshCw, XCircle, Save, Moon, Sun, BookOpen, Briefcase, WifiOff, HelpCircle, Send, MessageSquare
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from 'recharts';
 import * as XLSX from 'xlsx';
-import { collection, onSnapshot, writeBatch, doc, serverTimestamp, query, orderBy, where } from 'firebase/firestore';
+import { collection, onSnapshot, writeBatch, doc, serverTimestamp, query, orderBy, where, getDocs, deleteDoc, setDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { format } from 'date-fns';
 
@@ -23,15 +24,46 @@ import { mockPlan, t, ProcurementPlanItem } from './data';
 import { auth, db, loginWithGoogle, logout } from './firebase';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'plan' | 'spec' | 'history' | 'structure'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'plan' | 'spec' | 'history' | 'structure' | 'initiators' | 'cabinet' | 'suppliers' | 'wiki' | 'trash'>('dashboard');
   const [selectedSpecIndex, setSelectedSpecIndex] = useState<number>(0);
   const [lang, setLang] = useState<'ru' | 'kz'>('ru');
   const [planData, setPlanData] = useState<ProcurementPlanItem[]>([]);
   const [historyData, setHistoryData] = useState<any[]>([]);
+  const [trashData, setTrashData] = useState<{ plan: any[], history: any[] }>({ plan: [], history: [] });
   const [dashboardStats, setDashboardStats] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [loadingText, setLoadingText] = useState<string | null>('Загрузка приложения...');
   const [loginError, setLoginError] = useState<string | null>(null);
+
+  const [darkMode, setDarkMode] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if (isDark) {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+    
+    if (!localStorage.getItem('tutorialSeen_v2')) {
+      setTimeout(() => setShowTutorial(true), 1500);
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    localStorage.setItem('darkMode', String(next));
+    document.documentElement.classList.toggle('dark', next);
+  };
+  
+  const closeTutorial = () => {
+    setShowTutorial(false);
+    localStorage.setItem('tutorialSeen_v2', 'true');
+  };
+
+  // Define super admin
+  const isAdmin = user?.email === 'kazyyev.chiefengineer@gmail.com';
 
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -41,6 +73,12 @@ export default function App() {
         const qPlan = query(collection(db, 'planItems'), where('companyId', '==', 'default'));
         const unsubPlan = onSnapshot(qPlan, (snap) => {
           const items = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+          // Сортировка по номеру п/п для сохранения оригинального порядка как в Excel
+          items.sort((a, b) => {
+             const rowA = String(a.rowNum || '');
+             const rowB = String(b.rowNum || '');
+             return rowA.localeCompare(rowB, undefined, { numeric: true, sensitivity: 'base' });
+          });
           // If no items in DB, fallback to mock data
           setPlanData(items.length ? items : mockPlan);
           setLoadingText(null);
@@ -82,7 +120,15 @@ export default function App() {
            }
         });
 
-        return () => { unsubPlan(); unsubHist(); unsubStats(); };
+        // Listen to Trash
+        const unsubTrashPlan = onSnapshot(collection(db, 'planTrash'), (snap) => {
+           setTrashData(prev => ({ ...prev, plan: snap.docs.map(d => ({ id: d.id, ...d.data() })) }));
+        });
+        const unsubTrashHistory = onSnapshot(collection(db, 'historyTrash'), (snap) => {
+           setTrashData(prev => ({ ...prev, history: snap.docs.map(d => ({ id: d.id, ...d.data() })) }));
+        });
+
+        return () => { unsubPlan(); unsubHist(); unsubStats(); unsubTrashPlan(); unsubTrashHistory(); };
       } else {
         // Fallback for visual data when offline/testing without auth, but we will show login screen instead.
         setPlanData(mockPlan); 
@@ -182,46 +228,94 @@ export default function App() {
         <nav className="flex flex-col gap-2">
           <button 
             onClick={() => setActiveTab('dashboard')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'dashboard' ? 'glass-btn-active' : 'hover:bg-white/40'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'dashboard' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
           >
             <LayoutDashboard className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.dashboard}</span>
           </button>
+          
+          <button 
+            onClick={() => setActiveTab('cabinet')}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'cabinet' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+          >
+            <User className="w-5 h-5 opacity-70 shrink-0" /> 
+            <span className="leading-tight">Кабинет Инициатора</span>
+          </button>
+
           <button 
             onClick={() => setActiveTab('plan')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'plan' ? 'glass-btn-active' : 'hover:bg-white/40'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'plan' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
           >
             <FileSpreadsheet className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.plan}</span>
           </button>
           <button 
             onClick={() => setActiveTab('spec')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'spec' ? 'glass-btn-active' : 'hover:bg-white/40'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'spec' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
           >
             <FileText className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.spec}</span>
           </button>
           <button 
             onClick={() => setActiveTab('structure')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'structure' ? 'glass-btn-active' : 'hover:bg-white/40'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'structure' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
           >
             <Network className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.structure || 'Структура'}</span>
           </button>
           <button 
+            onClick={() => setActiveTab('initiators')}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'initiators' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+          >
+            <Users className="w-5 h-5 opacity-70 shrink-0" /> 
+            <span className="leading-tight">{txt.initiators || 'Администраторы'}</span>
+          </button>
+          
+          <div className="my-1 border-t border-slate-300/30 dark:border-slate-600/30"></div>
+
+          <button 
+            onClick={() => setActiveTab('suppliers')}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'suppliers' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+          >
+            <Briefcase className="w-5 h-5 opacity-70 shrink-0" /> 
+            <span className="leading-tight">Портал Поставщика</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab('wiki')}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'wiki' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+          >
+            <BookOpen className="w-5 h-5 opacity-70 shrink-0" /> 
+            <span className="leading-tight">База Знаний (Вики)</span>
+          </button>
+
+          <div className="my-1 border-t border-slate-300/30 dark:border-slate-600/30"></div>
+
+          <button 
             onClick={() => setActiveTab('history')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'history' ? 'glass-btn-active' : 'hover:bg-white/40'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'history' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
           >
             <History className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.history || 'История'}</span>
           </button>
-          <button 
-            onClick={() => setActiveTab('admin' as any)}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'admin' as any ? 'glass-btn-active' : 'hover:bg-white/40'}`}
-          >
-            <Settings className="w-5 h-5 opacity-70 shrink-0" /> 
-            <span className="leading-tight">{txt.admin || 'Админ'}</span>
-          </button>
+          {isAdmin && (
+            <>
+              <button 
+                onClick={() => setActiveTab('trash')}
+                className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'trash' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+              >
+                <Archive className="w-5 h-5 opacity-70 shrink-0" /> 
+                <span className="leading-tight">{txt.trash || 'Корзина/Архив'}</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('admin' as any)}
+                className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'admin' as any ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+              >
+                <Settings className="w-5 h-5 opacity-70 shrink-0" /> 
+                <span className="leading-tight">{txt.admin || 'Админ (API & ERP)'}</span>
+              </button>
+            </>
+          )}
         </nav>
 
         <div className="mt-auto pt-6 border-t border-slate-400/20 flex flex-col gap-4">
@@ -234,20 +328,24 @@ export default function App() {
             </div>
           )}
 
-          <div className="flex items-center justify-between px-2">
-            <span className="text-sm font-medium opacity-70 flex items-center gap-2">
-              <Globe className="w-4 h-4" /> {txt.lang}
-            </span>
-            <div className="flex bg-white/30 rounded-lg p-1 border border-white/50">
+          <div className="flex items-center justify-between px-2 gap-2">
+            <button
+               onClick={toggleDarkMode}
+               className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
+               title={darkMode ? "Светлая тема" : "Темная тема"}
+            >
+               {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <div className="flex bg-white/30 dark:bg-slate-800/30 rounded-lg p-1 border border-white/50 dark:border-slate-700/50 flex-1 justify-center">
               <button 
                 onClick={() => setLang('ru')}
-                className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'ru' ? 'bg-white shadow-sm' : 'opacity-50'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'ru' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
               >
                 RU
               </button>
               <button 
                 onClick={() => setLang('kz')}
-                className={`px-2 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'kz' ? 'bg-white shadow-sm' : 'opacity-50'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'kz' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
               >
                 KZ
               </button>
@@ -263,9 +361,14 @@ export default function App() {
              {activeTab === 'dashboard' && <DashboardView key="dashboard" txt={txt} planData={planData} stats={dashboardStats} />}
              {activeTab === 'plan' && <PlanView key="plan" txt={txt} planData={planData} user={user} setPlanData={setPlanData} onSelectSpec={(idx) => { setSelectedSpecIndex(idx); setActiveTab('spec'); }} />}
              {activeTab === 'spec' && <SpecView key="spec" txt={txt} lang={lang} planData={planData} selectedSpecIndex={selectedSpecIndex} setSelectedSpecIndex={setSelectedSpecIndex} />}
-             {activeTab === 'history' && <HistoryView key="history" historyData={historyData} txt={txt} />}
+             {activeTab === 'history' && <HistoryView key="history" historyData={historyData} txt={txt} isAdmin={isAdmin} user={user} />}
              {activeTab === 'structure' && <StructureView key="structure" txt={txt} />}
-             {activeTab === ('admin' as any) && <AdminView key="admin" txt={txt} stats={dashboardStats} planData={planData} user={user} />}
+             {activeTab === 'initiators' && <InitiatorsView key="initiators" txt={txt} planData={planData} />}
+             {activeTab === 'cabinet' && <CabinetView key="cabinet" user={user} />}
+             {activeTab === 'suppliers' && <SupplierPortalView key="suppliers" />}
+             {activeTab === 'wiki' && <WikiView key="wiki" />}
+             {activeTab === 'trash' && <TrashView key="trash" trashData={trashData} txt={txt} isAdmin={isAdmin} />}
+             {activeTab === ('admin' as any) && <AdminView key="admin" txt={txt} stats={dashboardStats} planData={planData} user={user} isAdmin={isAdmin} />}
            </AnimatePresence>
         </div>
       </main>
@@ -274,12 +377,23 @@ export default function App() {
 }
 
 function DashboardView({ txt, planData, stats }: { txt: any, planData: ProcurementPlanItem[], stats: any, key?: string }) {
-  const methodData = [
-    { name: 'Тендер', value: stats?.methodTender || 0 },
-    { name: 'ЗЦП', value: stats?.methodZCP || 0 },
-    { name: 'Один источник', value: stats?.methodOI || 0 },
-  ];
+  const methodData = React.useMemo(() => {
+    let tender = 0; let zcp = 0; let oi = 0;
+    planData.forEach(item => {
+      const method = String(item.procurementMethod || '').toLowerCase();
+      if (method.includes('тендер')) tender++;
+      else if (method.includes('зцп') || method.includes('запрос цен')) zcp++;
+      else if (method.includes('иои') || method.includes('один источ') || method.match(/\bои\b/)) oi++;
+    });
+    return [
+      { name: 'Тендер', value: tender },
+      { name: 'ЗЦП', value: zcp },
+      { name: 'Один источник', value: oi },
+    ];
+  }, [planData]);
+
   const COLORS = ['#3b82f6', '#10b981', '#8b5cf6'];
+  const CATEGORY_COLORS = ['#f59e0b', '#ec4899', '#06b6d4'];
 
   const quarterData = [
     { name: txt.q1, plan: stats?.q1Plan || 0, fact: stats?.q1Fact || 0 },
@@ -288,8 +402,31 @@ function DashboardView({ txt, planData, stats }: { txt: any, planData: Procureme
     { name: txt.q4, plan: stats?.q4Plan || 0, fact: stats?.q4Fact || 0 },
   ];
 
-  const totalBudgetFromPlan = planData.reduce((acc, curr) => acc + (Number(curr.totalSumApproB) || 0), 0);
+  const parseNum = (val: any) => {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    const clean = String(val).replace(/\s/g, '').replace(/[^0-9.,-]/g, '').replace(/,/g, '.');
+    return parseFloat(clean) || 0;
+  };
+
+  const totalBudgetFromPlan = planData.reduce((acc, curr) => acc + parseNum(curr.totalSumApproB), 0);
   const totalBudget = stats?.totalBudget !== undefined ? stats.totalBudget : totalBudgetFromPlan;
+
+  const itemKindData = React.useMemo(() => {
+    let goods = 0; let works = 0; let services = 0;
+    planData.forEach(item => {
+      const type = String(item.itemKind || '').toLowerCase();
+      const sum = parseNum(item.totalSumApproB);
+      if (type.includes('товар')) goods += sum;
+      else if (type.includes('работ')) works += sum;
+      else if (type.includes('услуг')) services += sum;
+    });
+    return [
+      { name: 'Товары', value: goods },
+      { name: 'Работы', value: works },
+      { name: 'Услуги', value: services },
+    ];
+  }, [planData]);
 
   return (
     <motion.div 
@@ -326,7 +463,7 @@ function DashboardView({ txt, planData, stats }: { txt: any, planData: Procureme
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6 flex-1 min-h-0">
+      <div className="grid grid-cols-4 gap-6 flex-1 min-h-0">
         <div className="col-span-2 glass-card p-6 flex flex-col min-h-[300px]">
           <h3 className="font-semibold text-lg mb-6">Исполнение закупок по кварталам</h3>
           <div className="flex-1">
@@ -334,7 +471,7 @@ function DashboardView({ txt, planData, stats }: { txt: any, planData: Procureme
               <BarChart data={quarterData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
                 <XAxis dataKey="name" stroke="#64748b" opacity={0.5} />
-                <YAxis stroke="#64748b" opacity={0.5} />
+                <YAxis stroke="#64748b" opacity={0.5} width={80} tickFormatter={(val) => (val / 1000000).toFixed(0) + 'M'} />
                 <Tooltip contentStyle={{ background: 'rgba(255,255,255,0.8)', borderRadius: '1rem', border: 'none', backdropFilter: 'blur(10px)' }}/>
                 <Legend />
                 <Bar dataKey="plan" fill="#94a3b8" radius={[4,4,0,0]} name="План" />
@@ -346,16 +483,16 @@ function DashboardView({ txt, planData, stats }: { txt: any, planData: Procureme
 
         <div className="col-span-1 flex flex-col gap-6">
           <div className="glass-card p-6 flex-1 flex flex-col min-h-[250px]">
-            <h3 className="font-semibold mb-2">{txt.byMethod}</h3>
+            <h3 className="font-semibold mb-2">{txt.byMethod} (Кол-во: шт)</h3>
             <div className="flex-1 flex justify-center items-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={methodData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                  <Pie data={methodData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value">
                     {methodData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ background: 'rgba(255,255,255,0.8)', borderRadius: '1rem', border: 'none' }}/>
+                  <Tooltip contentStyle={{ background: 'rgba(255,255,255,0.8)', borderRadius: '1rem', border: 'none' }} formatter={(value: number) => value + ' шт.'} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -366,7 +503,122 @@ function DashboardView({ txt, planData, stats }: { txt: any, planData: Procureme
             </div>
           </div>
         </div>
+        
+        <div className="col-span-1 flex flex-col gap-6">
+          <div className="glass-card p-6 flex-1 flex flex-col min-h-[250px]">
+            <h3 className="font-semibold mb-2">Объем по категориям</h3>
+            <div className="flex-1 flex justify-center items-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={itemKindData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={5} dataKey="value">
+                    {itemKindData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ background: 'rgba(255,255,255,0.8)', borderRadius: '1rem', border: 'none' }} formatter={(value: number) => value.toLocaleString('ru-RU') + ' ₸'} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex justify-center gap-4 text-[10px] font-medium flex-wrap">
+               <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#f59e0b]"></div> Товары</div>
+               <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#ec4899]"></div> Работы</div>
+               <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#06b6d4]"></div> Услуги</div>
+            </div>
+          </div>
+        </div>
       </div>
+    </motion.div>
+  )
+}
+
+function InitiatorsView({ txt, planData }: { txt: any, planData: ProcurementPlanItem[], key?: string }) {
+  const parseNum = (val: any) => {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    // Remove spaces, currency symbols, and handle Kazakh/Russian grouping
+    const clean = String(val).replace(/\s/g, '').replace(/[^0-9.,-]/g, '').replace(/,/g, '.');
+    return parseFloat(clean) || 0;
+  };
+
+  const initiatorStatsData = React.useMemo(() => {
+    const statsObj: Record<string, { count: number, sum: number }> = {};
+    planData.forEach(item => {
+        const init = item.initiator?.trim() || 'Не указано';
+        if (!statsObj[init]) statsObj[init] = { count: 0, sum: 0 };
+        statsObj[init].count += 1;
+        statsObj[init].sum += parseNum(item.totalSumApproB);
+    });
+    return Object.entries(statsObj).map(([name, data]) => ({ name, ...data })).sort((a, b) => b.count - a.count);
+  }, [planData]);
+
+  const top5Initiators = React.useMemo(() => {
+    return initiatorStatsData.slice(0, 5).map(item => ({
+       name: item.name.length > 20 ? item.name.substring(0, 20) + '...' : item.name,
+       fullName: item.name,
+       budget: item.sum
+    }));
+  }, [initiatorStatsData]);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="p-8 h-full flex flex-col gap-6 overflow-hidden"
+    >
+      <header className="flex justify-between items-center mb-0 shrink-0">
+        <h1 className="text-3xl font-bold tracking-tight">{txt.initiators || 'Администраторы'}</h1>
+      </header>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[300px] shrink-0">
+        <div className="glass-card flex-1 p-6 flex flex-col min-h-[300px]">
+          <h3 className="font-semibold text-lg mb-4">Топ-5 инициаторов по затратам (Бюджет)</h3>
+          <div className="flex-1">
+             <ResponsiveContainer width="100%" height="100%">
+               <BarChart data={top5Initiators} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(0,0,0,0.1)" />
+                 <XAxis type="number" stroke="#64748b" opacity={0.5} tickFormatter={(val) => (val / 1000000).toFixed(0) + 'M'} />
+                 <YAxis dataKey="name" type="category" width={100} stroke="#64748b" opacity={0.8} tick={{fontSize: 10}} />
+                 <Tooltip cursor={{fill: 'rgba(0,0,0,0.02)'}} contentStyle={{ background: 'rgba(255,255,255,0.9)', borderRadius: '1rem', border: 'none', backdropFilter: 'blur(10px)' }} formatter={(value: number) => value.toLocaleString('ru-RU') + ' ₸'} />
+                 <Bar dataKey="budget" fill="#6366f1" radius={[0,4,4,0]} name="Бюджет" barSize={24}>
+                   {top5Initiators.map((entry, index) => (
+                     <Cell key={`cell-${index}`} fill={['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe'][index % 5]} />
+                   ))}
+                 </Bar>
+               </BarChart>
+             </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="glass-card flex-1 p-6 flex flex-col min-h-[300px]">
+          <h3 className="font-semibold text-lg mb-4">Полный реестр</h3>
+          <div className="overflow-x-auto flex-1 h-[250px] relative no-scrollbar">
+          <table className="w-full text-sm text-left relative">
+            <thead className="sticky top-0 bg-white/90 backdrop-blur z-10 shadow-sm">
+              <tr className="border-b border-slate-200 uppercase opacity-60">
+                <th className="py-3 px-4">Инициатор (Администратор)</th>
+                <th className="py-3 px-4">Кол-во пунктов (Шт)</th>
+                <th className="py-3 px-4">Общий бюджет (Тенге)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {initiatorStatsData.map((init, i) => (
+                 <tr key={i} className="border-b border-slate-100 hover:bg-slate-50/50">
+                    <td className="py-3 px-4 font-medium max-w-sm truncate" title={init.name}>{init.name}</td>
+                    <td className="py-3 px-4 font-bold text-slate-700">{init.count}</td>
+                    <td className="py-3 px-4 text-emerald-600 font-bold tracking-tight bg-emerald-50/30">
+                       {init.sum.toLocaleString('ru-RU')} ₸
+                    </td>
+                 </tr>
+              ))}
+            </tbody>
+          </table>
+          {initiatorStatsData.length === 0 && (
+             <div className="p-4 text-center text-slate-500 opacity-60 font-medium">Нет данных об инициаторах</div>
+          )}
+        </div>
+      </div>
+     </div>
     </motion.div>
   )
 }
@@ -458,7 +710,7 @@ function StructureView({ txt }: { txt: any, key?: string }) {
     }
   ];
 
-  const TreeNode = ({ node, level = 0 }: { node: any, level?: number }) => {
+  const TreeNode = ({ node, level = 0 }: { node: any, level?: number, key?: any }) => {
     const [isExpanded, setIsExpanded] = useState(node.expanded || false);
     const hasChildren = node.children && node.children.length > 0;
 
@@ -509,16 +761,17 @@ function StructureView({ txt }: { txt: any, key?: string }) {
   );
 }
 
-function AdminView({ txt, stats, planData, user }: { txt: any, stats: any, planData: any[], user: any, key?: string }) {
+function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: any, planData: any[], user: any, isAdmin: boolean, key?: string }) {
   const [formData, setFormData] = useState<any>(stats || {});
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (stats) setFormData(stats);
   }, [stats]);
 
   const handleSave = async () => {
-    if (!user) return alert("Нужна авторизация");
+    if (!user || !isAdmin) return alert("Ограничено для администратора");
     setIsSaving(true);
     try {
       const batch = writeBatch(db);
@@ -530,7 +783,7 @@ function AdminView({ txt, stats, planData, user }: { txt: any, stats: any, planD
         updatedBy: user.uid 
       }, { merge: true });
       await batch.commit();
-      alert(txt.statsUpdated);
+      alert(txt.statsUpdated || "Данные обновлены");
     } catch (e) {
       console.error(e);
       alert("Ошибка сохранения");
@@ -539,8 +792,68 @@ function AdminView({ txt, stats, planData, user }: { txt: any, stats: any, planD
     }
   };
 
+  const handleClearHistory = async () => {
+    if (!isAdmin) return;
+    if (!confirm("Переместить всю историю корректировок в корзину?")) return;
+    
+    setIsDeleting(true);
+    try {
+      const snap = await getDocs(collection(db, 'planHistory'));
+      
+      const CHUNK_SIZE = 450;
+      for (let i = 0; i < snap.docs.length; i += CHUNK_SIZE) {
+        const chunk = snap.docs.slice(i, i + CHUNK_SIZE);
+        const batch = writeBatch(db);
+        chunk.forEach(d => {
+          const trashRef = doc(collection(db, 'historyTrash'));
+          batch.set(trashRef, { ...d.data(), originalId: d.id, deletedAt: serverTimestamp(), deletedBy: user.email });
+          batch.delete(d.ref);
+        });
+        await batch.commit();
+      }
+      
+      alert("История перемещена в корзину");
+    } catch (e) {
+      console.error(e);
+      alert("Ошибка при очистке истории");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleClearPlan = async () => {
+    if (!isAdmin) return;
+    if (!confirm("ВНИМАНИЕ! Переместить ВЕСЬ ПЛАН ЗАКУПОК в корзину? (Вы сможете восстановить его позже)")) return;
+    
+    setIsDeleting(true);
+    try {
+      const snap = await getDocs(collection(db, 'planItems'));
+      
+      const CHUNK_SIZE = 450;
+      for (let i = 0; i < snap.docs.length; i += CHUNK_SIZE) {
+        const chunk = snap.docs.slice(i, i + CHUNK_SIZE);
+        const batch = writeBatch(db);
+        chunk.forEach(d => {
+          const trashRef = doc(collection(db, 'planTrash'));
+          batch.set(trashRef, { ...d.data(), originalId: d.id, deletedAt: serverTimestamp(), deletedBy: user.email });
+          batch.delete(d.ref);
+        });
+        await batch.commit();
+      }
+
+      alert("План закупок перемещен в корзину");
+    } catch (e) {
+      console.error(e);
+      alert("Ошибка при удалении плана");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleChange = (field: string, val: any) => {
-    setFormData((prev: any) => ({ ...prev, [field]: Number(val) }));
+    const clean = String(val).replace(/\s/g, '').replace(/,/g, '.');
+    const num = parseFloat(clean);
+    setFormData((prev: any) => ({ ...prev, [field]: isNaN(num) ? 0 : num }));
   };
 
   return (
@@ -550,9 +863,11 @@ function AdminView({ txt, stats, planData, user }: { txt: any, stats: any, planD
       exit={{ opacity: 0, x: -20 }}
       className="p-8 h-full overflow-auto"
     >
-      <h1 className="text-3xl font-bold mb-8">{txt.admin || 'Админ-панель'}</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">{txt.admin || 'Админ-панель'}</h1>
+      </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         <div className="flex flex-col gap-6 glass-card p-6 border-blue-100 bg-blue-50/10">
           <h3 className="font-bold text-lg text-blue-800 border-b pb-2">Основные показатели</h3>
           <div className="grid grid-cols-2 gap-4">
@@ -607,7 +922,7 @@ function AdminView({ txt, stats, planData, user }: { txt: any, stats: any, planD
         </div>
       </div>
 
-      <div className="mt-10 flex justify-end">
+      <div className="flex justify-end mb-12">
         <button 
           onClick={handleSave}
           disabled={isSaving}
@@ -616,11 +931,71 @@ function AdminView({ txt, stats, planData, user }: { txt: any, stats: any, planD
           {isSaving ? '...' : txt.save}
         </button>
       </div>
+
+      <div className="glass-card p-8 border-rose-100 bg-rose-50/10">
+        <h3 className="font-bold text-xl text-rose-800 mb-6 flex items-center gap-3">
+            <Archive className="w-6 h-6" /> Управление данными (Архивация)
+        </h3>
+        <p className="text-sm text-slate-500 mb-8 italic">Данные будут перемещены в корзину, где вы сможете просмотреть их или восстановить.</p>
+        
+        <div className="flex flex-wrap gap-6">
+            <button 
+              onClick={handleClearHistory}
+              disabled={isDeleting}
+              className="flex items-center gap-3 px-6 py-4 bg-white border border-rose-200 text-rose-600 rounded-xl font-bold hover:bg-rose-50 transition-all shadow-sm"
+            >
+                <History className="w-5 h-5" /> Архивировать историю
+            </button>
+            <button 
+              onClick={async () => {
+                if (!confirm("ВНИМАНИЕ! ВСЯ ИСТОРИЯ БУДЕТ УДАЛЕНА НАВСЕГДА БЕЗ ВОЗМОЖНОСТИ ВОССТАНОВЛЕНИЯ. Продолжить?")) return;
+                setIsDeleting(true);
+                try {
+                  const snap = await getDocs(collection(db, 'planHistory'));
+                  const CHUNK_SIZE = 450;
+                  for (let i = 0; i < snap.docs.length; i += CHUNK_SIZE) {
+                    const b = writeBatch(db);
+                    snap.docs.slice(i, i + CHUNK_SIZE).forEach(d => b.delete(d.ref));
+                    await b.commit();
+                  }
+                  alert("История полностью удалена");
+                } catch (e) { console.error(e); } finally { setIsDeleting(false); }
+              }}
+              disabled={isDeleting}
+              className="flex items-center gap-3 px-6 py-4 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl font-bold hover:bg-rose-100 transition-all shadow-sm"
+              title="Удалить навсегда без архивации"
+            >
+                <XCircle className="w-5 h-5" /> Удалить историю навсегда
+            </button>
+            <button 
+              onClick={handleClearPlan}
+              disabled={isDeleting}
+              className="flex items-center gap-3 px-6 py-4 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-200"
+            >
+                <Archive className="w-5 h-5" /> Переместить план в архив
+            </button>
+        </div>
+      </div>
     </motion.div>
   );
 }
 
-function HistoryView({ historyData, txt, key }: { historyData: any[], txt: any, key?: string }) {
+function HistoryView({ historyData, txt, isAdmin, user, key }: { historyData: any[], txt: any, isAdmin: boolean, user: any, key?: string }) {
+  const handleDeleteItem = async (record: any) => {
+    if (!isAdmin) return;
+    if (!confirm("Переместить эту запись в корзину?")) return;
+    try {
+      const batch = writeBatch(db);
+      const trashRef = doc(collection(db, 'historyTrash'));
+      batch.set(trashRef, { ...record, originalId: record.id, deletedAt: serverTimestamp(), deletedBy: user.email });
+      batch.delete(doc(db, 'planHistory', record.id));
+      await batch.commit();
+    } catch (e) {
+      console.error(e);
+      alert("Ошибка при архивации");
+    }
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -637,8 +1012,17 @@ function HistoryView({ historyData, txt, key }: { historyData: any[], txt: any, 
          ) : (
            <div className="flex flex-col gap-4 p-4">
              {historyData.map((record) => (
-                <div key={record.id} className="glass-card p-6 border-l-4 border-l-blue-500 hover:bg-white/60 transition-colors">
-                  <div className="flex justify-between items-start mb-3">
+                <div key={record.id} className="glass-card p-6 border-l-4 border-l-blue-500 hover:bg-white/60 transition-colors relative group">
+                  {isAdmin && (
+                    <button 
+                      onClick={() => handleDeleteItem(record)}
+                      className="absolute top-4 right-4 p-2 text-rose-300 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition-all"
+                      title="В архив"
+                    >
+                      <Archive className="w-4 h-4" />
+                    </button>
+                  )}
+                  <div className="flex justify-between items-start mb-3 pr-10">
                      <div>
                        <h3 className="font-bold text-slate-800 text-lg">Загрузка плана</h3>
                        <p className="text-xs font-semibold opacity-60">
@@ -669,10 +1053,198 @@ function HistoryView({ historyData, txt, key }: { historyData: any[], txt: any, 
   );
 }
 
+function TrashView({ trashData, txt, isAdmin }: { trashData: { plan: any[], history: any[] }, txt: any, isAdmin: boolean, key?: string }) {
+  const [activeSubTab, setActiveSubTab] = useState<'plan' | 'history'>('plan');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleRestorePlan = async (item: any) => {
+     if (!isAdmin) return;
+     setIsProcessing(true);
+     try {
+        const batch = writeBatch(db);
+        const restoreData = { ...item };
+        delete restoreData.id;
+        delete restoreData.originalId;
+        delete restoreData.deletedAt;
+        delete restoreData.deletedBy;
+        
+        batch.set(doc(db, 'planItems', item.originalId || doc(collection(db, 'planItems')).id), restoreData);
+        batch.delete(doc(db, 'planTrash', item.id));
+        await batch.commit();
+     } catch (e) { console.error(e); } finally { setIsProcessing(false); }
+  };
+
+  const handleRestoreHistory = async (item: any) => {
+     if (!isAdmin) return;
+     setIsProcessing(true);
+     try {
+        const batch = writeBatch(db);
+        const restoreData = { ...item };
+        delete restoreData.id;
+        delete restoreData.originalId;
+        delete restoreData.deletedAt;
+        delete restoreData.deletedBy;
+        
+        batch.set(doc(db, 'planHistory', item.originalId || doc(collection(db, 'planHistory')).id), restoreData);
+        batch.delete(doc(db, 'historyTrash', item.id));
+        await batch.commit();
+     } catch (e) { console.error(e); } finally { setIsProcessing(false); }
+  };
+
+  const handlePersistentDelete = async (id: string, type: 'plan' | 'history') => {
+     if (!isAdmin) return;
+     if (!confirm("Удалить навсегда? Это действие невозможно отменить.")) return;
+     setIsProcessing(true);
+     try {
+        await deleteDoc(doc(db, type === 'plan' ? 'planTrash' : 'historyTrash', id));
+     } catch (e) { console.error(e); } finally { setIsProcessing(false); }
+  };
+
+  const handleEmptyTrash = async () => {
+    if (!isAdmin) return;
+    if (!confirm(`Очистить всю корзину (${activeSubTab === 'plan' ? 'планы' : 'историю'}) навсегда?`)) return;
+    setIsProcessing(true);
+    try {
+      const coll = activeSubTab === 'plan' ? 'planTrash' : 'historyTrash';
+      const snap = await getDocs(collection(db, coll));
+      const CHUNK = 450;
+      for (let i = 0; i < snap.docs.length; i += CHUNK) {
+        const b = writeBatch(db);
+        snap.docs.slice(i, i + CHUNK).forEach(d => b.delete(d.ref));
+        await b.commit();
+      }
+      alert("Корзина очищена");
+    } catch (e) { console.error(e); } finally { setIsProcessing(false); }
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="p-8 h-full flex flex-col gap-6"
+    >
+      <header className="flex justify-between items-center mb-4 flex-wrap gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-800 flex items-center gap-3">
+             <Archive className="w-8 h-8 text-rose-500" /> {txt.trash || 'Корзина / Архив'}
+          </h1>
+          <p className="text-sm text-slate-500 mt-1 font-medium italic">Место для временного хранения удаленных данных</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={handleEmptyTrash}
+            disabled={isProcessing || (activeSubTab === 'plan' ? trashData.plan.length === 0 : trashData.history.length === 0)}
+            className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-700 rounded-xl text-xs font-bold hover:bg-rose-100 transition-all border border-rose-200 disabled:opacity-30"
+          >
+            <XCircle className="w-4 h-4" /> Очистить всё
+          </button>
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner">
+             <button 
+               onClick={() => setActiveSubTab('plan')}
+               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'plan' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+             >
+                План закупок ({trashData.plan.length})
+             </button>
+             <button 
+               onClick={() => setActiveSubTab('history')}
+               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'history' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+             >
+                История ({trashData.history.length})
+             </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex-1 overflow-auto glass-card border border-rose-100 bg-rose-50/5 p-2">
+         {activeSubTab === 'plan' ? (
+            <div className="flex flex-col gap-3 p-4">
+               {trashData.plan.map((item) => (
+                 <div key={item.id} className="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center group hover:border-rose-300 transition-all shadow-sm">
+                    <div className="flex flex-col gap-1 overflow-hidden pr-4">
+                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Удалено {item.deletedAt?.toDate ? format(item.deletedAt.toDate(), 'dd.MM.yyyy HH:mm') : '-'}</span>
+                       <h4 className="font-bold text-slate-800 truncate" title={item.nameRu}>{item.nameRu}</h4>
+                       <span className="text-xs text-slate-500 font-medium">№ п/п: {item.rowNum} | Бюджет: {item.totalSumApproB?.toLocaleString('ru-RU')} ₸</span>
+                    </div>
+                    <div className="flex gap-2">
+                       <button 
+                         disabled={isProcessing}
+                         onClick={() => handleRestorePlan(item)}
+                         className="p-3 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 hover:scale-105 active:scale-95 transition-all shadow-sm border border-emerald-100"
+                         title="Восстановить"
+                       >
+                          <RefreshCw className="w-5 h-5" />
+                       </button>
+                       <button 
+                         disabled={isProcessing}
+                         onClick={() => handlePersistentDelete(item.id, 'plan')}
+                         className="p-3 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 hover:scale-105 active:scale-95 transition-all shadow-sm border border-rose-100"
+                         title="Удалить навсегда"
+                       >
+                          <XCircle className="w-5 h-5" />
+                       </button>
+                    </div>
+                 </div>
+               ))}
+               {trashData.plan.length === 0 && <div className="text-center p-12 text-slate-400 font-medium italic">Корзина планов пуста</div>}
+            </div>
+         ) : (
+            <div className="flex flex-col gap-3 p-4">
+               {trashData.history.map((record) => (
+                 <div key={record.id} className="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center group hover:border-rose-300 transition-all shadow-sm">
+                    <div className="flex flex-col gap-1 overflow-hidden pr-4">
+                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Удалено {record.deletedAt?.toDate ? format(record.deletedAt.toDate(), 'dd.MM.yyyy HH:mm') : '-'}</span>
+                       <h4 className="font-bold text-slate-800">Загрузка плана от {record.createdAt?.toDate ? format(record.createdAt.toDate(), 'dd.MM.yyyy') : '-'}</h4>
+                       <span className="text-xs text-slate-500 font-medium">{record.changesSummary}</span>
+                    </div>
+                    <div className="flex gap-2">
+                       <button 
+                         disabled={isProcessing}
+                         onClick={() => handleRestoreHistory(record)}
+                         className="p-3 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 hover:scale-105 active:scale-95 transition-all shadow-sm border border-emerald-100"
+                         title="Восстановить"
+                       >
+                          <RefreshCw className="w-5 h-5" />
+                       </button>
+                       <button 
+                         disabled={isProcessing}
+                         onClick={() => handlePersistentDelete(record.id, 'history')}
+                         className="p-3 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 hover:scale-105 active:scale-95 transition-all shadow-sm border border-rose-100"
+                         title="Удалить навсегда"
+                       >
+                          <XCircle className="w-5 h-5" />
+                       </button>
+                    </div>
+                 </div>
+               ))}
+               {trashData.history.length === 0 && <div className="text-center p-12 text-slate-400 font-medium italic">Корзина истории пуста</div>}
+            </div>
+         )}
+      </div>
+    </motion.div>
+  );
+}
+
 function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any, planData: ProcurementPlanItem[], user: any, setPlanData: any, onSelectSpec: (idx: number) => void, key?: string }) {
   const [search, setSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState<'all' | 'товар' | 'работа' | 'услуга'>('all');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [previewDiff, setPreviewDiff] = useState<{ added: number, updated: number, removed: number, parsed: any[] } | null>(null);
+  const [discussItem, setDiscussItem] = useState<ProcurementPlanItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const parseNum = (val: any) => {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    const clean = String(val).replace(/\s/g, '').replace(/[^0-9.,-]/g, '').replace(/,/g, '.');
+    return parseFloat(clean) || 0;
+  };
+
+  const menuCategories = [
+    { id: 'all', name: 'Все' },
+    { id: 'товар', name: 'Товары' },
+    { id: 'работа', name: 'Работы' },
+    { id: 'услуга', name: 'Услуги' },
+  ];
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -687,7 +1259,7 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
       
       let headerRowIndex = 0;
       for (let i = 0; i < data.length; i++) {
-        if (data[i] && data[i][0] && String(data[i][0]).includes('п/п')) {
+        if (data[i] && data[i][0] && String(data[i][0]).toLowerCase().includes('п/п')) {
            headerRowIndex = i;
            break;
         }
@@ -708,97 +1280,47 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
         budgetRuName: String(r[10] || ''),
         procurementMethod: String(r[11] || ''),
         unit: String(r[12] || ''),
-        quantity: Number(r[13]) || 0,
-        unitPrice: Number(r[14]) || 0,
-        totalSumApproB: Number(r[15]) || 0,
-        sum2026: Number(r[16]) || 0,
+        quantity: parseNum(r[13]),
+        unitPrice: parseNum(r[14]),
+        totalSumApproB: parseNum(r[15]),
+        sum2026: parseNum(r[16]),
         month: String(r[17] || ''),
         deliveryPeriodKz: String(r[18] || ''),
         deliveryPeriodRu: String(r[19] || ''),
         kato: String(r[20] || ''),
         deliveryPlaceKz: String(r[21] || ''),
         deliveryPlaceRu: String(r[22] || ''),
-        advancePercent: Number(r[23]) || 0,
+        advancePercent: parseNum(r[23]),
         initiator: String(r[24] || ''),
         companyId: 'default'
       }));
 
       if (parsed.length > 0) {
         if (!user) {
-          alert('Необходима авторизация для синхронизации плана.');
+          alert('Необходима авторизация для загрузки плана.');
           setPlanData(parsed);
           setIsProcessing(false);
           return;
         }
 
-        const syncWithFirebase = async () => {
-          try {
-             const batch = writeBatch(db);
-             let addedCount = 0;
-             let removedCount = 0;
-             let updatedCount = 0;
+        const oldMap = new Map(planData.map(p => [(p.code || '') + (p.nameRu || ''), p]));
+        const newMap = new Map(parsed.map(p => [(p.code || '') + (p.nameRu || ''), p]));
 
-             // Map by Code+NameRu as unique identifier to track changes safely
-             const oldMap = new Map(planData.map(p => [p.code + p.nameRu, p]));
-             const newMap = new Map(parsed.map(p => [p.code + p.nameRu, p]));
+        let added = 0;
+        let updated = 0;
+        let removed = 0;
 
-             // Find removed elements (exist in old, not in new)
-             for (const [key, oldItem] of oldMap.entries()) {
-               if (!newMap.has(key)) {
-                  removedCount++;
-                  if ((oldItem as any).id) {
-                     batch.delete(doc(db, 'planItems', (oldItem as any).id));
-                  }
-               }
-             }
+        for (const key of oldMap.keys()) {
+          if (!newMap.has(key)) removed++;
+        }
+        for (const [key, newItem] of newMap.entries()) {
+          if (!oldMap.has(key)) added++;
+          else updated++;
+        }
 
-             // Find added and updated
-             for (const [key, newItem] of newMap.entries()) {
-               if (!oldMap.has(key)) {
-                  addedCount++;
-                  const ref = doc(collection(db, 'planItems'));
-                  batch.set(ref, { 
-                     ...newItem, 
-                     createdAt: serverTimestamp(),
-                     updatedAt: serverTimestamp() 
-                  });
-               } else {
-                  // Basically it exists, update it to refresh its data
-                  updatedCount++;
-                  const oldItem: any = oldMap.get(key);
-                  if (oldItem && oldItem.id) {
-                     const updateData: any = { ...newItem, updatedAt: serverTimestamp() };
-                     delete updateData.createdAt; // Prevent rule violations by omitted immutable field
-                     batch.set(doc(db, 'planItems', oldItem.id), updateData, { merge: true });
-                  }
-               }
-             }
-
-             // Create History record
-             const histRef = doc(collection(db, 'planHistory'));
-             batch.set(histRef, {
-                createdAt: serverTimestamp(),
-                createdBy: user.uid,
-                createdByName: user.email || 'Неизвестно',
-                companyId: 'default',
-                addedCount,
-                removedCount,
-                updatedCount,
-                changesSummary: `План загружен. Добавлено: ${addedCount}, Удалено: ${removedCount}, Обновлено: ${updatedCount}`
-             });
-
-             await batch.commit();
-             setIsProcessing(false);
-
-          } catch (e) {
-             console.error("Firebase Batch Error:", e);
-             alert('Ошибка при сохранении в базу данных. Временная загрузка локально.');
-             setPlanData(parsed);
-             setIsProcessing(false);
-          }
-        };
-
-        syncWithFirebase();
+        setPreviewDiff({ added, updated, removed, parsed });
+        setIsProcessing(false);
+        return;
       } else {
         setIsProcessing(false);
       }
@@ -807,45 +1329,154 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
   
-  const filteredPlan = planData.filter(p => {
-    if (!search.trim()) return true;
-    const terms = search.toLowerCase().split(' ').filter(Boolean);
-    return terms.every(term => 
-      String(p.nameRu).toLowerCase().includes(term) || 
-      String(p.code).toLowerCase().includes(term) ||
-      String(p.nameKz).toLowerCase().includes(term) ||
-      String(p.rowNum).toLowerCase().includes(term) ||
-      String(p.initiator).toLowerCase().includes(term) ||
-      String(p.budgetRuName).toLowerCase().includes(term)
-    );
-  });
+  const confirmAndSyncPlan = async () => {
+    if (!previewDiff) return;
+    setIsProcessing(true);
+    const { parsed, added, updated, removed } = previewDiff;
+
+    try {
+      const oldItems = await getDocs(collection(db, 'planItems'));
+      const CHUNK = 450;
+      for (let i = 0; i < oldItems.docs.length; i += CHUNK) {
+        const b = writeBatch(db);
+        oldItems.docs.slice(i, i + CHUNK).forEach(d => b.delete(d.ref));
+        await b.commit();
+      }
+
+      for (let i = 0; i < parsed.length; i += CHUNK) {
+        const b = writeBatch(db);
+        parsed.slice(i, i + CHUNK).forEach(item => {
+          const ref = doc(collection(db, 'planItems'));
+          b.set(ref, { ...item, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+        });
+        await b.commit();
+      }
+
+      const histRef = doc(collection(db, 'planHistory'));
+      await setDoc(histRef, {
+        createdAt: serverTimestamp(),
+        createdBy: user.uid,
+        createdByName: user.email || 'Неизвестно',
+        companyId: 'default',
+        addedCount: added,
+        updatedCount: updated,
+        removedCount: removed,
+        changesSummary: `Обновлен план. Добавлено: ${added}, Обновлено: ${updated}, Удалено: ${removed} (всего: ${parsed.length})`
+      });
+
+      setIsProcessing(false);
+      setPreviewDiff(null);
+      alert(`План успешно загружен и сохранен!\n\nРезультат:\n+ Добавлено: ${added}\n~ Обновлено: ${updated}\n- Удалено: ${removed}`);
+    } catch (e) {
+      console.error("Firebase Sync Error:", e);
+      alert('Ошибка синхронизации');
+      setIsProcessing(false);
+    }
+  };
+
+  const filteredPlan = planData
+    .filter(p => {
+      if (activeCategory !== 'all' && String(p.itemKind).toLowerCase() !== activeCategory) return false;
+      if (!search.trim()) return true;
+      const terms = search.toLowerCase().split(' ').filter(Boolean);
+      return terms.every(term => 
+        String(p.nameRu).toLowerCase().includes(term) || 
+        String(p.code).toLowerCase().includes(term) ||
+        String(p.nameKz).toLowerCase().includes(term) ||
+        String(p.rowNum).toLowerCase().includes(term) ||
+        String(p.initiator).toLowerCase().includes(term) ||
+        String(p.budgetRuName).toLowerCase().includes(term)
+      );
+    })
+    .sort((a, b) => {
+      // Numerical sort for row numbers
+      const numA = parseInt(String(a.rowNum)) || 0;
+      const numB = parseInt(String(b.rowNum)) || 0;
+      if (numA !== numB) return numA - numB;
+      return String(a.rowNum).localeCompare(String(b.rowNum));
+    });
 
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="h-full flex flex-col"
+      className="h-full flex flex-col relative"
     >
-      <div className="p-8 pb-4 flex justify-between items-center shrink-0">
-         <div className="flex items-center gap-4">
+      {previewDiff && (
+        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col gap-6">
+            <h3 className="text-2xl font-bold text-slate-800">Предпросмотр загрузки</h3>
+            <p className="text-slate-600 text-sm">
+              В новом плане <strong>{previewDiff.parsed.length}</strong> позиций. Вот что изменится в базе:
+            </p>
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center p-3 bg-emerald-50 text-emerald-700 rounded-lg">
+                 <span className="font-medium">Новых позиций:</span>
+                 <span className="font-bold text-lg">+{previewDiff.added}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-blue-50 text-blue-700 rounded-lg">
+                 <span className="font-medium">Совпадений (Обновлено):</span>
+                 <span className="font-bold text-lg">~{previewDiff.updated}</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-rose-50 text-rose-700 rounded-lg">
+                 <span className="font-medium">Удалено позиций:</span>
+                 <span className="font-bold text-lg">-{previewDiff.removed}</span>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end mt-4">
+              <button 
+                disabled={isProcessing}
+                onClick={() => setPreviewDiff(null)}
+                className="px-5 py-2.5 rounded-xl font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+              >
+                Отмена
+              </button>
+              <button 
+                disabled={isProcessing}
+                onClick={confirmAndSyncPlan}
+                className="px-5 py-2.5 rounded-xl font-medium bg-indigo-600 text-white hover:bg-indigo-700 shadow flex items-center gap-2 transition-colors disabled:opacity-50"
+              >
+                {isProcessing ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                Применить и сохранить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="p-8 pb-4 flex justify-between items-center shrink-0 flex-wrap gap-4">
+         <div className="flex items-center gap-6">
            <h1 className="text-3xl font-bold tracking-tight">{txt.plan}</h1>
-           <div>
-             <input type="file" accept=".xlsx, .xls" className="hidden" ref={fileInputRef} onChange={(e) => { setIsProcessing(true); handleFileUpload(e); }} />
-             <button disabled={isProcessing} onClick={() => fileInputRef.current?.click()} className="glass-btn-primary flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold shadow-[0_4px_16px_rgba(59,130,246,0.4)] disabled:opacity-50">
-                <Upload className={`w-4 h-4 ${isProcessing ? 'animate-bounce' : ''}`} /> {isProcessing ? 'Обработка...' : txt.uploadPlan}
-             </button>
+           <div className="flex bg-slate-100 p-1 rounded-xl shadow-inner border border-slate-200">
+             {menuCategories.map(cat => (
+               <button 
+                 key={cat.id}
+                 onClick={() => setActiveCategory(cat.id as any)}
+                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+               >
+                 {cat.name}
+               </button>
+             ))}
            </div>
          </div>
-         <div className="relative">
-           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-50" />
-           <input 
-             type="text" 
-             placeholder={txt.searchPlaceholder}
-             value={search}
-             onChange={e => setSearch(e.target.value)}
-             className="glass-input pl-10 pr-4 py-2 w-[300px] text-sm"
-           />
+         <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-50" />
+              <input 
+                type="text" 
+                placeholder={txt.searchPlaceholder}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="glass-input pl-10 pr-4 py-2 w-[280px] text-sm"
+              />
+            </div>
+            <div>
+              <input type="file" accept=".xlsx, .xls" className="hidden" ref={fileInputRef} onChange={(e) => { setIsProcessing(true); handleFileUpload(e); }} />
+              <button disabled={isProcessing} onClick={() => fileInputRef.current?.click()} className="glass-btn-primary flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 disabled:opacity-50 transition-transform active:scale-95">
+                 <Upload className={`w-4 h-4 ${isProcessing ? 'animate-bounce' : ''}`} /> {isProcessing ? '...' : txt.uploadPlan}
+              </button>
+            </div>
          </div>
       </div>
 
@@ -885,13 +1516,23 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
              <tbody>
                {filteredPlan.map((item, idx) => (
                  <tr key={idx} className="hover:bg-white/50 transition-colors group">
-                   <td className="p-2 border-r border-indigo-100 bg-indigo-50/50 text-center sticky left-0 z-10 group-hover:bg-indigo-100/80 transition-colors">
-                     <button 
-                       onClick={() => onSelectSpec(planData.indexOf(item))} 
-                       className="glass-btn-primary px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider"
-                     >
-                       {txt.createSpecBtn || 'ТЗ'}
-                     </button>
+                   <td className="p-2 border-r border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/50 dark:bg-indigo-900/20 text-center sticky left-0 z-10 group-hover:bg-indigo-100/80 dark:group-hover:bg-indigo-800/40 transition-colors">
+                     <div className="flex items-center justify-center gap-1.5 min-w-[70px]">
+                       <button 
+                         onClick={() => onSelectSpec(planData.indexOf(item))} 
+                         className="glass-btn-primary px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider tooltip-trigger"
+                         title="Создать Техспецификацию"
+                       >
+                         {txt.createSpecBtn || 'ТЗ'}
+                       </button>
+                       <button
+                         onClick={() => setDiscussItem(item)}
+                         className="p-1.5 rounded-lg bg-white/60 hover:bg-white text-indigo-500 shadow-sm transition-all"
+                         title="Обсуждение и комментарии"
+                       >
+                          <MessageSquare className="w-4 h-4" />
+                       </button>
+                     </div>
                    </td>
                    <td className="p-3 font-mono font-medium pl-4">{item.rowNum}</td>
                    <td className="p-3 max-w-[200px] truncate bg-blue-50/20" title={item.type}>{item.type}</td>
@@ -931,22 +1572,79 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
            </table>
          </div>
       </div>
+      
+      {/* Item Discussion Modal */}
+      <AnimatePresence>
+        {discussItem && (
+          <ItemDiscussionModal item={discussItem} user={user} onClose={() => setDiscussItem(null)} />
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
 
 function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex }: { txt: any, lang: 'ru'|'kz', planData: ProcurementPlanItem[], selectedSpecIndex: number, setSelectedSpecIndex: (idx: number) => void, key?: string }) {
+  const [activeCategory, setActiveCategory] = useState<'all' | 'товар' | 'работа' | 'услуга'>('all');
   const specData = planData[selectedSpecIndex] || null;
 
-  const [approverPosition, setApproverPosition] = useState('');
-  const [approverFIO, setApproverFIO] = useState('');
+  const loadSavedTemplate = () => {
+    try {
+      const saved = localStorage.getItem('techSpecTemplate');
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  };
+  const tpl = loadSavedTemplate();
+
+  const [approverPosition, setApproverPosition] = useState(tpl.approverPosition || '');
+  const [approverFIO, setApproverFIO] = useState(tpl.approverFIO || '');
   
-  const [developerPosition, setDeveloperPosition] = useState('');
-  const [developerFIO, setDeveloperFIO] = useState('');
+  const [developerPosition, setDeveloperPosition] = useState(tpl.developerPosition || '');
+  const [developerFIO, setDeveloperFIO] = useState(tpl.developerFIO || '');
   
-  const [paymentTerms, setPaymentTerms] = useState('');
-  const [warranty, setWarranty] = useState('');
+  const [paymentTerms, setPaymentTerms] = useState(tpl.paymentTerms || '');
+  const [warranty, setWarranty] = useState(tpl.warranty || '');
   const [reqDescStr, setReqDescStr] = useState('');
+
+  // Auto-save templates when they change
+  React.useEffect(() => {
+    localStorage.setItem('techSpecTemplate', JSON.stringify({
+      approverPosition, approverFIO, developerPosition, developerFIO, paymentTerms, warranty
+    }));
+  }, [approverPosition, approverFIO, developerPosition, developerFIO, paymentTerms, warranty]);
+
+  const menuCategories = [
+    { id: 'all', name: 'Все' },
+    { id: 'товар', name: 'Товары' },
+    { id: 'работа', name: 'Работы' },
+    { id: 'услуга', name: 'Услуги' },
+  ];
+
+  const filteredOptions = React.useMemo(() => {
+    return planData.filter(p => {
+      if (activeCategory === 'all') return true;
+      const kind = String(p.itemKind || '').toLowerCase();
+      if (activeCategory === 'товар') return kind.includes('товар');
+      if (activeCategory === 'работа') return kind.includes('работ');
+      if (activeCategory === 'услуга') return kind.includes('услуг');
+      return false;
+    });
+  }, [planData, activeCategory]);
+
+  // Auto-select first item when category changes if current item is not in category
+  React.useEffect(() => {
+    if (activeCategory !== 'all') {
+      const currentItem = planData[selectedSpecIndex];
+      const kind = String(currentItem?.itemKind || '').toLowerCase();
+      let isCurrentInCategory = false;
+      if (activeCategory === 'товар') isCurrentInCategory = kind.includes('товар');
+      if (activeCategory === 'работа') isCurrentInCategory = kind.includes('работ');
+      if (activeCategory === 'услуга') isCurrentInCategory = kind.includes('услуг');
+      
+      if (!isCurrentInCategory && filteredOptions.length > 0) {
+        setSelectedSpecIndex(planData.indexOf(filteredOptions[0]));
+      }
+    }
+  }, [activeCategory, filteredOptions, planData, selectedSpecIndex, setSelectedSpecIndex]);
 
   const handleExportWord = () => {
     const specDoc = document.getElementById('spec-document-content');
@@ -1020,15 +1718,31 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
              <Settings className="w-64 h-64 translate-x-12 translate-y-12" />
            </div>
            
-           <div className="flex max-w-4xl items-center gap-4 mb-6 relative z-10 w-full">
+           <div className="flex max-w-5xl items-center gap-4 mb-6 relative z-10 w-full flex-wrap lg:flex-nowrap">
              <label className="text-sm font-bold opacity-80 whitespace-nowrap shrink-0">{txt.enterRowNum}</label>
+             
+             <div className="flex bg-white/40 p-1 rounded-xl border border-white/60 shadow-inner shrink-0">
+               {menuCategories.map(cat => (
+                 <button 
+                   key={cat.id}
+                   onClick={() => setActiveCategory(cat.id as any)}
+                   className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                 >
+                   {cat.name}
+                 </button>
+               ))}
+             </div>
+
              <select 
                value={selectedSpecIndex} 
                onChange={e => setSelectedSpecIndex(Number(e.target.value))}
                className="glass-input px-3 py-2 text-sm font-medium w-full text-slate-800 bg-white/70 cursor-pointer outline-none hover:bg-white/90 transition-colors" 
              >
-               {planData.map((item, idx) => (
-                 <option key={idx} value={idx}>
+               <option value={-1} disabled>-- Выберите из категории {activeCategory === 'all' ? 'Все' : menuCategories.find(c => c.id === activeCategory)?.name} --</option>
+               {filteredOptions.length === 0 ? (
+                 <option value={-1} disabled>Нет данных в этой категории</option>
+               ) : filteredOptions.map((item, idx) => (
+                 <option key={`opt-${item.rowNum}-${planData.indexOf(item)}-${idx}`} value={planData.indexOf(item)}>
                    №{item.rowNum} | [{item.itemKind}] — {lang === 'ru' ? item.nameRu : item.nameKz}
                  </option>
                ))}
@@ -1157,5 +1871,245 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
         )}
       </div>
     </motion.div>
+  )
+}
+
+function CabinetView({ user }: { user: any, key?: string }) {
+  const [offlineReqs, setOfflineReqs] = useState<any[]>([]);
+  const isOnline = navigator.onLine;
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('offlineRequests');
+      if (stored) setOfflineReqs(JSON.parse(stored));
+    } catch {}
+  }, []);
+
+  const addMockReq = () => {
+    const nr = { id: Date.now(), title: 'Новая оффлайн заявка', date: new Date().toLocaleDateString() };
+    const next = [...offlineReqs, nr];
+    setOfflineReqs(next);
+    localStorage.setItem('offlineRequests', JSON.stringify(next));
+    alert(isOnline ? 'Синхронизировано с базой!' : 'Нет сети! Заявка сохранена локально и будет отправлена при появлении интернета.');
+    if (isOnline) {
+       setTimeout(() => setOfflineReqs([]), 1000);
+    }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 h-full flex flex-col pt-12 overflow-y-auto w-full">
+       <div className="flex items-center gap-4 mb-8">
+          <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-200 dark:border-emerald-800">
+             <User className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold dark:text-white">Панель Инициатора (Мои заявки)</h2>
+            <p className="text-slate-500 font-medium">Подача заявок на включение в план напрямую</p>
+          </div>
+       </div>
+
+       {!isOnline && (
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 p-4 rounded-xl flex items-center gap-3 mb-6 animate-pulse font-medium max-w-2xl">
+             <WifiOff className="w-5 h-5 shrink-0" />
+             Нет интернета. Офлайн-режим активен (PWA). Ваши заявки сохраняются в кэше браузера.
+          </div>
+       )}
+
+       <div className="glass-card max-w-2xl p-8 flex flex-col gap-4">
+          <h3 className="font-bold text-lg border-b border-slate-200 dark:border-slate-700 pb-2 dark:text-white">Сформировать потребность (Zero Paper)</h3>
+          <p className="text-sm opacity-70 mb-4 dark:text-slate-300">Выберите товар или услугу из каталога, укажите количество, и мы передадим данные экономистам.</p>
+          
+          <input type="text" placeholder="Наименование (например, Реле РЭЛ-1М)" className="glass-input p-3" />
+          <div className="flex gap-4">
+            <input type="number" placeholder="Количество" className="glass-input p-3 w-1/3" />
+            <input type="text" placeholder="Ед. изм. (шт, кг)" className="glass-input p-3 w-1/3" />
+            <input type="text" placeholder="Примерная цена" className="glass-input p-3 w-1/3" />
+          </div>
+          
+          <button onClick={addMockReq} className="glass-btn-primary py-3 rounded-xl font-bold mt-4 shadow-lg shadow-blue-500/20">
+            {isOnline ? 'Отправить в обработку' : 'Сохранить локально (Offline)'}
+          </button>
+       </div>
+       
+       {offlineReqs.length > 0 && !isOnline && (
+         <div className="mt-8 max-w-2xl">
+            <h4 className="font-bold mb-4 opacity-70 dark:text-slate-300">Ожидают синхронизации ({offlineReqs.length})</h4>
+            <div className="flex flex-col gap-3">
+               {offlineReqs.map(r => (
+                 <div key={r.id} className="bg-white/40 dark:bg-slate-800/40 p-4 rounded-xl border border-white/30 dark:border-slate-700/50 flex justify-between items-center opacity-70 dark:text-slate-200">
+                    <span className="font-semibold">{r.title}</span>
+                    <span className="text-xs font-mono">{r.date}</span>
+                 </div>
+               ))}
+            </div>
+         </div>
+       )}
+    </motion.div>
+  )
+}
+
+function SupplierPortalView() {
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 h-full flex flex-col pt-12 overflow-y-auto w-full">
+       <div className="flex items-center gap-4 mb-8">
+          <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-600 dark:text-rose-400 shadow-sm border border-rose-200 dark:border-rose-800">
+             <Briefcase className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold dark:text-white">Портал Поставщика (SRM)</h2>
+            <p className="text-slate-500 font-medium">Микро-кабинет для сбора прайс-листов и КП от рынка</p>
+          </div>
+       </div>
+
+       <div className="grid grid-cols-2 gap-8 max-w-4xl">
+         <div className="glass-card p-6 border-dashed border-2 hover:border-blue-400 dark:hover:border-blue-500 transition-colors cursor-pointer flex flex-col items-center justify-center h-[300px] text-center dark:border-slate-600">
+            <Upload className="w-12 h-12 text-slate-400 mb-4" />
+            <h3 className="font-bold text-lg mb-2 dark:text-white">Загрузить Коммерческое (КП)</h3>
+            <p className="text-sm text-slate-500 max-w-[250px]">Поставщики могут загрузить свои цены в формате PDF/Excel, и наш ИИ сам вытащит цены.</p>
+         </div>
+         
+         <div className="flex flex-col gap-4">
+            <h3 className="font-bold text-lg mb-2 dark:text-white">Текущие открытые сборы цен</h3>
+            {[1,2,3].map(i => (
+              <div key={i} className="glass-card p-4 hover:scale-[1.02] transition-transform cursor-pointer border border-white/50 dark:border-slate-700">
+                 <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-sm dark:text-white">Поставка трансформаторов</span>
+                    <span className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] px-2 py-1 rounded-full font-bold">Активно</span>
+                 </div>
+                 <p className="text-xs text-slate-500 mb-3">Ожидаем коммерческие предложения до конца недели.</p>
+                 <div className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">+ Загрузить ответ</div>
+              </div>
+            ))}
+         </div>
+       </div>
+    </motion.div>
+  )
+}
+
+function WikiView() {
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 h-full flex flex-col pt-12 overflow-y-auto w-full">
+       <div className="flex items-center gap-4 mb-8">
+          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm border border-blue-200 dark:border-blue-800">
+             <BookOpen className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold dark:text-white">База Знаний (Вики)</h2>
+            <p className="text-slate-500 font-medium">Регламенты, инструкции и FAQ для всех сотрудников DTJ</p>
+          </div>
+       </div>
+
+       <div className="relative max-w-3xl mb-8">
+         <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 w-5 h-5 dark:text-slate-400" />
+         <input type="text" placeholder="Найти инструкцию (например, 'Как заключить допник')" className="glass-input w-full p-4 pl-12 text-lg shadow-lg dark:text-slate-200" />
+       </div>
+
+       <div className="grid grid-cols-2 gap-6 max-w-5xl">
+          {[
+            { t: 'Аварийный закуп (Из одного источника)', d: 'Что делать, если сломалась стрелка и деталь нужна "еще вчера". Полный алгоритм согласований.' },
+            { t: 'Требования к МСБ и ОТП в 2026 году', d: 'Список обязательных сертификатов качества (СТ-KZ) для защиты процента местного содержания.' },
+            { t: 'Разделение бюджета OPEX и CAPEX', d: 'Как правильно классифицировать закупку: это ОС или расходники? Инструкция для инженеров.' },
+            { t: 'Частые ошибки в Тех.Спецификациях', d: 'Почему юристы заворачивают документы: разбор ТОП-5 ошибок, чтобы не переделывать.' }
+          ].map((w, i) => (
+            <div key={i} className="glass-card p-6 flex flex-col gap-3 hover:translate-y-[-2px] hover:shadow-xl transition-all cursor-pointer border border-white/40 dark:border-slate-700/50">
+               <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center rounded-xl text-indigo-500 mb-2">
+                 <FileText className="w-5 h-5" />
+               </div>
+               <h3 className="font-bold text-lg dark:text-white leading-tight">{w.t}</h3>
+               <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{w.d}</p>
+            </div>
+          ))}
+       </div>
+    </motion.div>
+  )
+}
+
+function ItemDiscussionModal({ item, user, onClose }: { item: ProcurementPlanItem, user: any, onClose: () => void }) {
+  const [messages, setMessages] = useState<any[]>([]);
+  const [text, setText] = useState('');
+  const itemId = `${item.rowNum}_${item.code}`.replace(/[^a-zA-Z0-9_]/g, '');
+
+  useEffect(() => {
+    if (!itemId) return;
+    const q = query(collection(db, 'planComments'), where('itemId', '==', itemId), orderBy('createdAt', 'asc'));
+    const unsub = onSnapshot(q, (snap) => setMessages(snap.docs.map(d => ({id: d.id, ...d.data()}))));
+    return () => unsub();
+  }, [itemId]);
+
+  const send = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    const txt = text;
+    setText('');
+    try {
+      await setDoc(doc(collection(db, 'planComments')), {
+        itemId,
+        text: txt,
+        userName: user?.email || 'Неизвестный',
+        createdAt: serverTimestamp()
+      });
+    } catch (e) {
+      console.error(e);
+      setText(txt);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/20 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+       <motion.div 
+         initial={{ x: 400, opacity: 0 }} 
+         animate={{ x: 0, opacity: 1 }} 
+         exit={{ x: 400, opacity: 0 }}
+         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+         className="w-[450px] bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800"
+       >
+          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start bg-slate-50 dark:bg-slate-800/50">
+             <div>
+                <h3 className="font-bold text-lg dark:text-white flex items-center gap-2"><MessageSquare className="w-5 h-5 text-indigo-500" /> Обсуждение</h3>
+                <p className="text-xs opacity-60 mt-1 max-w-[300px] truncate" title={item.nameRu}>{item.nameRu}</p>
+                <div className="text-[10px] uppercase font-bold text-indigo-600 mt-2 bg-indigo-100 inline-block px-2 py-0.5 rounded">Лот № {item.rowNum}</div>
+             </div>
+             <button onClick={onClose} className="p-2 bg-slate-200 dark:bg-slate-700 rounded-full hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                <XCircle className="w-5 h-5 text-slate-500 dark:text-slate-300" />
+             </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-slate-50/50 dark:bg-slate-900/50">
+             {messages.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50">
+                   <MessageSquare className="w-12 h-12 mb-3 dark:text-slate-400" />
+                   <p className="text-sm font-medium dark:text-slate-400">Пока нет комментариев.<br/>Задайте вопрос по этой закупке.</p>
+                </div>
+             ) : (
+                messages.map(m => {
+                  const isMe = m.userName === user?.email;
+                  return (
+                    <div key={m.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                       <span className="text-[10px] opacity-40 font-semibold mb-1 px-1 flex gap-2 dark:text-slate-400">
+                         {m.userName}
+                       </span>
+                       <div className={`px-4 py-2.5 max-w-[85%] rounded-2xl text-sm leading-relaxed shadow-sm ${isMe ? 'bg-indigo-500 text-white rounded-tr-sm' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-tl-sm dark:text-slate-200'}`}>
+                          {m.text}
+                       </div>
+                    </div>
+                  )
+                })
+             )}
+          </div>
+
+          <form onSubmit={send} className="p-4 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex gap-3">
+             <input 
+               type="text" 
+               value={text}
+               onChange={e => setText(e.target.value)}
+               placeholder="Напишите комментарий..."
+               className="flex-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-400 transition-colors dark:text-white"
+             />
+             <button type="submit" disabled={!text.trim()} className="bg-indigo-500 hover:bg-indigo-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-colors">
+                <Send className="w-5 h-5 -ml-1" />
+             </button>
+          </form>
+       </motion.div>
+    </div>
   )
 }
