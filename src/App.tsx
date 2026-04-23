@@ -355,7 +355,7 @@ export default function App() {
              {activeTab === 'spec' && <SpecView key="spec" txt={txt} lang={lang} planData={planData} selectedSpecIndex={selectedSpecIndex} setSelectedSpecIndex={setSelectedSpecIndex} />}
              {activeTab === 'history' && <HistoryView historyData={historyData} txt={txt} isAdmin={isAdmin} user={user} />}
              {activeTab === 'structure' && <StructureView key="structure" txt={txt} />}
-             {activeTab === 'initiators' && <InitiatorsView key="initiators" txt={txt} planData={planData} />}
+             {activeTab === 'initiators' && <InitiatorsView txt={txt} planData={planData} />}
              {activeTab === 'cabinet' && <CabinetView key="cabinet" user={user} />}
              {activeTab === 'wiki' && <WikiView key="wiki" />}
              {activeTab === 'trash' && <TrashView key="trash" trashData={trashData} txt={txt} isAdmin={isAdmin} />}
@@ -522,7 +522,7 @@ function DashboardView({ txt, planData, stats }: { txt: any, planData: Procureme
   )
 }
 
-function InitiatorsView({ txt, planData }: { txt: any, planData: ProcurementPlanItem[], key?: string }) {
+function InitiatorsView({ txt, planData }: { txt: any, planData: ProcurementPlanItem[] }) {
   const parseNum = (val: any) => {
     if (typeof val === 'number') return val;
     if (!val) return 0;
@@ -544,7 +544,7 @@ function InitiatorsView({ txt, planData }: { txt: any, planData: ProcurementPlan
 
   const top5Initiators = React.useMemo(() => {
     return initiatorStatsData.slice(0, 5).map(item => ({
-       name: item.name.length > 20 ? item.name.substring(0, 20) + '...' : item.name,
+       name: item.name.length > 25 ? item.name.substring(0, 25) + '...' : item.name,
        fullName: item.name,
        budget: item.sum
     }));
@@ -561,17 +561,17 @@ function InitiatorsView({ txt, planData }: { txt: any, planData: ProcurementPlan
         <h1 className="text-3xl font-bold tracking-tight">{txt.initiators || 'Администраторы'}</h1>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[300px] shrink-0">
-        <div className="glass-card flex-1 p-6 flex flex-col min-h-[300px]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[300px] shrink-0 h-[450px]">
+        <div className="glass-card p-6 flex flex-col">
           <h3 className="font-semibold text-lg mb-4">Топ-5 инициаторов по затратам (Бюджет)</h3>
-          <div className="flex-1">
+          <div className="flex-1 w-full h-full relative">
              <ResponsiveContainer width="100%" height="100%">
-               <BarChart data={top5Initiators} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+               <BarChart data={top5Initiators} layout="vertical" margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(0,0,0,0.1)" />
                  <XAxis type="number" stroke="#64748b" opacity={0.5} tickFormatter={(val) => (val / 1000000).toFixed(0) + 'M'} />
-                 <YAxis dataKey="name" type="category" width={100} stroke="#64748b" opacity={0.8} tick={{fontSize: 10}} />
-                 <Tooltip cursor={{fill: 'rgba(0,0,0,0.02)'}} contentStyle={{ background: 'rgba(255,255,255,0.9)', borderRadius: '1rem', border: 'none', backdropFilter: 'blur(10px)' }} formatter={(value: number) => value.toLocaleString('ru-RU') + ' ₸'} />
-                 <Bar dataKey="budget" fill="#6366f1" radius={[0,4,4,0]} name="Бюджет" barSize={24}>
+                 <YAxis dataKey="name" type="category" width={160} stroke="#64748b" opacity={0.8} tick={{fontSize: 11, fill: 'currentColor'}} />
+                 <Tooltip cursor={{fill: 'rgba(0,0,0,0.02)'}} contentStyle={{ background: 'rgba(255,255,255,0.9)', borderRadius: '1rem', border: 'none', backdropFilter: 'blur(10px)', color: '#000' }} formatter={(value: number) => value.toLocaleString('ru-RU') + ' ₸'} />
+                 <Bar dataKey="budget" fill="#6366f1" radius={[0,4,4,0]} name="Бюджет" barSize={32}>
                    {top5Initiators.map((entry, index) => (
                      <Cell key={`cell-${index}`} fill={['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe'][index % 5]} />
                    ))}
