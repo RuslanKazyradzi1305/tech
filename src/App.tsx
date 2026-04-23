@@ -220,9 +220,9 @@ export default function App() {
 
       {/* Sidebar */}
       <aside className="w-64 glass-card m-4 flex flex-col gap-6 shrink-0 overflow-y-auto p-5 z-10 shadow-[0_8px_32px_rgba(0,0,0,0.05)]">
-        <div className="font-extrabold text-xl tracking-tight mb-4 flex items-center gap-3 text-slate-800">
-           <Box className="w-6 h-6 text-blue-500" />
-           Tech Spec
+        <div className="font-extrabold text-2xl tracking-tight mb-4 flex items-center gap-3">
+           <Box className="w-7 h-7 text-blue-500 shrink-0 drop-shadow-sm" />
+           <span className="bg-gradient-to-br from-blue-700 to-indigo-500 dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">Tech Spec</span>
         </div>
         
         <nav className="flex flex-col gap-2">
