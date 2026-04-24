@@ -15,10 +15,7 @@
     background-attachment: fixed;
   }
   
-  .dark body {
-    @apply text-slate-200;
-    background: radial-gradient(circle at top left, #0f172a 0%, #1e293b 100%);
-  }
+  
 }
 
 @layer components {
@@ -35,13 +32,7 @@
     @apply transition-colors duration-500 ease-in-out;
   }
   
-  .dark .glass-card {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 
-      0 8px 32px 0 rgba(0, 0, 0, 0.3),
-      inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
-  }
+  
   
   .glass-btn {
     background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.1));
@@ -54,14 +45,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  .dark .glass-btn {
-    background: linear-gradient(135deg, rgba(30,41,59,0.7), rgba(15,23,42,0.5));
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 
-      0 4px 12px 0 rgba(0, 0, 0, 0.2),
-      inset 0 1px 1px 0 rgba(255,255,255,0.05);
-    @apply text-slate-200;
-  }
+  
   
   .glass-btn:hover {
     transform: translateY(-2px);
@@ -71,12 +55,7 @@
     background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.3));
   }
   
-  .dark .glass-btn:hover {
-    box-shadow: 
-      0 8px 24px 0 rgba(0, 0, 0, 0.3),
-      inset 0 1px 1px 0 rgba(255,255,255,0.1);
-    background: linear-gradient(135deg, rgba(51,65,85,0.8), rgba(30,41,59,0.8));
-  }
+  
 
   .glass-btn-active {
     background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(37,99,235,0.05));
@@ -85,11 +64,7 @@
     color: #2563eb;
   }
   
-  .dark .glass-btn-active {
-    background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(37,99,235,0.15));
-    border-color: rgba(59,130,246,0.5);
-    color: #60a5fa;
-  }
+  
 
   .glass-btn-primary {
     background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
@@ -115,22 +90,14 @@
     color: #1e293b;
     transition: all 0.2s ease;
   }
-  .dark .glass-input {
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
-  }
+  
   .glass-input:focus {
     outline: none;
     border-color: rgba(59, 130, 246, 0.5);
     background: rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), inset 0 2px 4px 0 rgba(31, 38, 135, 0.03);
   }
-  .dark .glass-input:focus {
-    border-color: rgba(96, 165, 250, 0.5);
-    background: rgba(30, 41, 59, 0.6);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-  }
+  
 
   /* Table styling */
   table {
@@ -147,28 +114,18 @@
     z-index: 10;
     @apply transition-colors duration-500;
   }
-  .dark th {
-    background: rgba(15, 23, 42, 0.8);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-    border-right: 1px solid rgba(148, 163, 184, 0.1);
-  }
+  
   td {
     border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     border-right: 1px solid rgba(148, 163, 184, 0.2);
     background: rgba(255, 255, 255, 0.2);
     transition: background 0.2s ease;
   }
-  .dark td {
-    border-bottom: 1px solid rgba(148, 163, 184, 0.05);
-    border-right: 1px solid rgba(148, 163, 184, 0.05);
-    background: rgba(30, 41, 59, 0.2);
-  }
+  
   tr:hover td {
     background: rgba(255, 255, 255, 0.5);
   }
-  .dark tr:hover td {
-    background: rgba(51, 65, 85, 0.4);
-  }
+  
 }
 
 /* Decorative Orbs */
@@ -182,6 +139,6 @@
   transition: opacity 0.5s ease;
 }
 
-.dark .glow-orb.bg-indigo-300 { background: #312e81; opacity: 0.4; }
-.dark .glow-orb.bg-emerald-200 { background: #064e3b; opacity: 0.3; }
-.dark .glow-orb.bg-blue-300 { background: #1e3a8a; opacity: 0.4; }
+
+
+

@@ -95,5 +95,19 @@ service cloud.firestore {
       allow update: if false;
       allow delete: if isSignedIn();
     }
+
+    match /suppliers/{supId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if false;
+      allow delete: if isSignedIn();
+    }
+
+    match /wikiArticles/{articleId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
   }
 }

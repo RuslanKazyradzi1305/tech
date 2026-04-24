@@ -9,7 +9,7 @@ import {
   LayoutDashboard, FileSpreadsheet, FileText, Search, Download, Settings,
   Globe, Box, Upload, FileDown, PieChart as PieChartIcon, History, LogOut, LogIn,
   Network, ChevronRight, ChevronDown, User, Home, Building2, Users,
-  Trash2, AlertTriangle, Archive, RefreshCw, XCircle, Save, Moon, Sun, BookOpen, Briefcase, WifiOff, HelpCircle, Send, MessageSquare, List
+  Trash2, AlertTriangle, Archive, RefreshCw, XCircle, Save, Moon, Sun, BookOpen, Briefcase, WifiOff, HelpCircle, Send, MessageSquare, List, ShieldCheck
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -35,28 +35,16 @@ export default function App() {
   const [loadingText, setLoadingText] = useState<string | null>('Загрузка приложения...');
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  const [darkMode, setDarkMode] = useState(false);
+  
   const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
-    const isDark = localStorage.getItem('darkMode') === 'true';
-    if (isDark) {
-      setDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
-    
     if (!localStorage.getItem('tutorialSeen_v2')) {
       setTimeout(() => setShowTutorial(true), 1500);
     }
   }, []);
 
-  const toggleDarkMode = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    localStorage.setItem('darkMode', String(next));
-    document.documentElement.classList.toggle('dark', next);
-  };
-  
+    
   const closeTutorial = () => {
     setShowTutorial(false);
     localStorage.setItem('tutorialSeen_v2', 'true');
@@ -159,26 +147,26 @@ export default function App() {
   const txt = t[lang];
 
   if (loadingText) {
-    return <div className="flex h-screen items-center justify-center font-bold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900">{loadingText}</div>;
+    return <div className="flex h-screen items-center justify-center font-bold text-slate-500  bg-slate-50 ">{loadingText}</div>;
   }
 
   // Guard the app behind the Login Screen
   if (!user) {
     return (
-      <div className="flex h-screen w-full relative isolate overflow-hidden bg-slate-50 dark:bg-slate-900">
+      <div className="flex h-screen w-full relative isolate overflow-hidden bg-slate-50 ">
         <div className="glow-orb bg-indigo-300 w-[600px] h-[600px] top-[-200px] left-[-200px]"></div>
         <div className="glow-orb bg-emerald-200 w-[500px] h-[500px] bottom-[-100px] right-[-100px]"></div>
         
         <div className="w-full h-full flex flex-col items-center justify-center relative z-10 p-4">
           <div className="glass-card flex flex-col items-center p-10 max-w-[420px] w-full shadow-2xl relative bg-white/70 backdrop-blur-xl">
-             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6 shadow-sm border border-blue-200 dark:border-blue-800/50">
+             <div className="w-16 h-16 bg-blue-100  rounded-2xl flex items-center justify-center text-blue-600  mb-6 shadow-sm border border-blue-200 ">
                <Box className="w-8 h-8" />
              </div>
              
-             <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200 tracking-tight text-center mb-3">
+             <h1 className="text-2xl font-bold text-slate-800  tracking-tight text-center mb-3">
                Tech Spec System
              </h1>
-             <p className="text-slate-500 dark:text-slate-400 text-[13px] text-center mb-8 font-medium px-4">
+             <p className="text-slate-500  text-[13px] text-center mb-8 font-medium px-4">
                Для доступа к графику закупок, истории и панелям аналитики, пожалуйста, авторизуйтесь в корпоративной сети
              </p>
 
@@ -197,12 +185,12 @@ export default function App() {
              </button>
              
              <div className="mt-8 pt-6 border-t border-slate-200/50 w-full flex justify-center">
-                 <div className="flex items-center gap-2 px-3 py-1 bg-white/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-500 dark:text-slate-400">
+                 <div className="flex items-center gap-2 px-3 py-1 bg-white/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-500 ">
                     <Globe className="w-3.5 h-3.5" />
                     <span>Язык интерфейса:</span>
-                    <button onClick={() => setLang('ru')} className={`font-bold transition-colors ${lang === 'ru' ? 'text-blue-600 dark:text-blue-400' : 'hover:text-slate-800 dark:hover:text-slate-200'}`}>RU</button>
+                    <button onClick={() => setLang('ru')} className={`font-bold transition-colors ${lang === 'ru' ? 'text-blue-600 ' : 'hover:text-slate-800 :text-slate-200'}`}>RU</button>
                     <span className="opacity-30">|</span>
-                    <button onClick={() => setLang('kz')} className={`font-bold transition-colors ${lang === 'kz' ? 'text-blue-600 dark:text-blue-400' : 'hover:text-slate-800 dark:hover:text-slate-200'}`}>KZ</button>
+                    <button onClick={() => setLang('kz')} className={`font-bold transition-colors ${lang === 'kz' ? 'text-blue-600 ' : 'hover:text-slate-800 :text-slate-200'}`}>KZ</button>
                  </div>
              </div>
           </div>
@@ -222,13 +210,13 @@ export default function App() {
       <aside className="w-64 glass-card m-4 flex flex-col gap-6 shrink-0 overflow-y-auto p-5 z-10 shadow-[0_8px_32px_rgba(0,0,0,0.05)]">
         <div className="font-extrabold text-2xl tracking-tight mb-4 flex items-center gap-3">
            <Box className="w-7 h-7 text-blue-500 shrink-0 drop-shadow-sm" />
-           <span className="bg-gradient-to-br from-blue-700 to-indigo-500 dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">Tech Spec</span>
+           <span className="bg-gradient-to-br from-blue-700 to-indigo-500   bg-clip-text text-transparent">Tech Spec</span>
         </div>
         
         <nav className="flex flex-col gap-2">
           <button 
             onClick={() => setActiveTab('dashboard')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'dashboard' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'dashboard' ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
           >
             <LayoutDashboard className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.dashboard}</span>
@@ -236,7 +224,7 @@ export default function App() {
           
           <button 
             onClick={() => setActiveTab('cabinet')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'cabinet' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'cabinet' ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
           >
             <User className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">Кабинет Инициатора</span>
@@ -244,48 +232,48 @@ export default function App() {
 
           <button 
             onClick={() => setActiveTab('plan')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'plan' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'plan' ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
           >
             <FileSpreadsheet className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.plan}</span>
           </button>
           <button 
             onClick={() => setActiveTab('spec')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'spec' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'spec' ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
           >
             <FileText className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.spec}</span>
           </button>
           <button 
             onClick={() => setActiveTab('structure')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'structure' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'structure' ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
           >
             <Network className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.structure || 'Структура'}</span>
           </button>
           <button 
             onClick={() => setActiveTab('initiators')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'initiators' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'initiators' ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
           >
             <Users className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.initiators || 'Администраторы'}</span>
           </button>
           
-          <div className="my-1 border-t border-slate-300/30 dark:border-slate-600/30"></div>
+          <div className="my-1 border-t border-slate-300/30 "></div>
 
           <button 
             onClick={() => setActiveTab('wiki')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'wiki' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'wiki' ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
           >
             <BookOpen className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">База Знаний (Вики)</span>
           </button>
 
-          <div className="my-1 border-t border-slate-300/30 dark:border-slate-600/30"></div>
+          <div className="my-1 border-t border-slate-300/30 "></div>
 
           <button 
             onClick={() => setActiveTab('history')}
-            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'history' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+            className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'history' ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
           >
             <History className="w-5 h-5 opacity-70 shrink-0" /> 
             <span className="leading-tight">{txt.history || 'История'}</span>
@@ -294,14 +282,14 @@ export default function App() {
             <>
               <button 
                 onClick={() => setActiveTab('trash')}
-                className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'trash' ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+                className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'trash' ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
               >
                 <Archive className="w-5 h-5 opacity-70 shrink-0" /> 
                 <span className="leading-tight">{txt.trash || 'Корзина/Архив'}</span>
               </button>
               <button 
                 onClick={() => setActiveTab('admin' as any)}
-                className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'admin' as any ? 'glass-btn-active' : 'hover:bg-white/40 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}
+                className={`flex items-center justify-start text-left gap-3 px-4 py-3 rounded-xl font-medium transition-all w-full ${activeTab === 'admin' as any ? 'glass-btn-active' : 'hover:bg-white/40 :bg-slate-700/40 text-slate-700 '}`}
               >
                 <Settings className="w-5 h-5 opacity-70 shrink-0" /> 
                 <span className="leading-tight">{txt.admin || 'Админ (API & ERP)'}</span>
@@ -313,7 +301,7 @@ export default function App() {
         <div className="mt-auto pt-6 border-t border-slate-400/20 flex flex-col gap-4">
           {user && (
             <div className="flex flex-col gap-2 relative">
-               <div className="text-xs font-semibold px-2 truncate text-slate-600 dark:text-slate-400" title={user.email}>{user.email}</div>
+               <div className="text-xs font-semibold px-2 truncate text-slate-600 " title={user.email}>{user.email}</div>
                <button onClick={logout} className="flex items-center gap-2 px-3 py-2 text-xs font-bold bg-rose-500/10 text-rose-600 rounded-lg hover:bg-rose-500/20 transition-colors">
                   <LogOut className="w-3 h-3" /> Выйти
                </button>
@@ -321,23 +309,16 @@ export default function App() {
           )}
 
           <div className="flex items-center justify-between px-2 gap-2">
-            <button
-               onClick={toggleDarkMode}
-               className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors text-slate-500 dark:text-slate-400"
-               title={darkMode ? "Светлая тема" : "Темная тема"}
-            >
-               {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-            <div className="flex bg-white/30 dark:bg-slate-800/30 rounded-lg p-1 border border-white/50 dark:border-slate-700/50 flex-1 justify-center">
+            <div className="flex bg-white/30  rounded-lg p-1 border border-white/50  flex-1 justify-center">
               <button 
                 onClick={() => setLang('ru')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'ru' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-slate-200 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'ru' ? 'bg-white  shadow-sm text-slate-800  ' : 'opacity-50 '}`}
               >
                 RU
               </button>
               <button 
                 onClick={() => setLang('kz')}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'kz' ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-800 dark:text-slate-200 dark:text-white' : 'opacity-50 dark:text-slate-400'}`}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${lang === 'kz' ? 'bg-white  shadow-sm text-slate-800  ' : 'opacity-50 '}`}
               >
                 KZ
               </button>
@@ -349,7 +330,7 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 p-4 pl-0 overflow-hidden relative z-10 flex">
         <div className="glass-card flex-1 w-full h-full relative overflow-y-auto no-scrollbar shadow-[0_8px_32px_rgba(0,0,0,0.05)]">
-           <AnimatePresence mode="wait">
+           
              {activeTab === 'dashboard' && <DashboardView key="dashboard" txt={txt} planData={planData} stats={dashboardStats} />}
              {activeTab === 'plan' && <PlanView key="plan" txt={txt} planData={planData} user={user} setPlanData={setPlanData} onSelectSpec={(idx) => { setSelectedSpecIndex(idx); setActiveTab('spec'); }} />}
              {activeTab === 'spec' && <SpecView key="spec" txt={txt} lang={lang} planData={planData} selectedSpecIndex={selectedSpecIndex} setSelectedSpecIndex={setSelectedSpecIndex} />}
@@ -357,10 +338,9 @@ export default function App() {
              {activeTab === 'structure' && <StructureView key="structure" txt={txt} />}
              {activeTab === 'initiators' && <InitiatorsView txt={txt} planData={planData} />}
              {activeTab === 'cabinet' && <CabinetView key="cabinet" user={user} />}
-             {activeTab === 'wiki' && <WikiView key="wiki" />}
+             {activeTab === 'wiki' && <WikiView isAdmin={isAdmin} user={user} />}
              {activeTab === 'trash' && <TrashView key="trash" trashData={trashData} txt={txt} isAdmin={isAdmin} />}
              {activeTab === ('admin' as any) && <AdminView key="admin" txt={txt} stats={dashboardStats} planData={planData} user={user} isAdmin={isAdmin} />}
-           </AnimatePresence>
         </div>
       </main>
     </div>
@@ -441,15 +421,16 @@ function DashboardView({ txt, planData, stats }: { txt: any, planData: Procureme
         </div>
         <div className="glass-card p-6 flex flex-col justify-center">
           <h3 className="text-sm font-semibold opacity-70 uppercase tracking-widest">{txt.totalItems}</h3>
-          <p className="text-4xl font-light mt-2 tracking-tight">{planData.length}</p>
+          <p className="text-4xl font-light mt-2 tracking-tight">{stats?.totalItems !== undefined ? stats.totalItems : planData.length}</p>
         </div>
         <div className="glass-card p-6 flex flex-col justify-center relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10">
              <PieChartIcon className="w-24 h-24" />
           </div>
           <h3 className="text-sm font-semibold opacity-70 uppercase tracking-widest">{txt.executionStatus}</h3>
-          <div className="flex items-end gap-2 mt-2">
+          <div className="flex items-baseline gap-3 mt-2">
             <p className="text-4xl font-light tracking-tight text-indigo-600">{stats?.executionStatus || 0}%</p>
+            <p className="text-sm font-medium text-slate-500">({stats?.executionStatusQuantity || 0} шт)</p>
           </div>
         </div>
       </div>
@@ -465,8 +446,8 @@ function DashboardView({ txt, planData, stats }: { txt: any, planData: Procureme
                 <YAxis stroke="#64748b" opacity={0.5} width={80} tickFormatter={(val) => (val / 1000000).toFixed(0) + 'M'} />
                 <Tooltip contentStyle={{ background: 'rgba(255,255,255,0.8)', borderRadius: '1rem', border: 'none', backdropFilter: 'blur(10px)' }}/>
                 <Legend />
-                <Bar dataKey="plan" fill="#94a3b8" radius={[4,4,0,0]} name="План" />
-                <Bar dataKey="fact" fill="#3b82f6" radius={[4,4,0,0]} name="Факт" />
+                <Bar dataKey="plan" fill="#94a3b8" radius={[4,4,0,0]} name="План (Бюджет)" />
+                <Bar dataKey="fact" fill="#10b981" radius={[4,4,0,0]} name="Экономия" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -594,9 +575,9 @@ function InitiatorsView({ txt, planData }: { txt: any, planData: ProcurementPlan
             </thead>
             <tbody>
               {initiatorStatsData.map((init, i) => (
-                 <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                 <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 :bg-slate-900/50">
                     <td className="py-3 px-4 font-medium max-w-sm truncate" title={init.name}>{init.name}</td>
-                    <td className="py-3 px-4 font-bold text-slate-700 dark:text-slate-300">{init.count}</td>
+                    <td className="py-3 px-4 font-bold text-slate-700 ">{init.count}</td>
                     <td className="py-3 px-4 text-emerald-600 font-bold tracking-tight bg-emerald-50/30">
                        {init.sum.toLocaleString('ru-RU')} ₸
                     </td>
@@ -605,7 +586,7 @@ function InitiatorsView({ txt, planData }: { txt: any, planData: ProcurementPlan
             </tbody>
           </table>
           {initiatorStatsData.length === 0 && (
-             <div className="p-4 text-center text-slate-500 dark:text-slate-400 opacity-60 font-medium">Нет данных об инициаторах</div>
+             <div className="p-4 text-center text-slate-500  opacity-60 font-medium">Нет данных об инициаторах</div>
           )}
         </div>
       </div>
@@ -711,7 +692,7 @@ function StructureView({ txt }: { txt: any, key?: string }) {
       <div className="flex flex-col">
         <div 
           onClick={() => hasChildren && setIsExpanded(!isExpanded)}
-          className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors cursor-pointer hover:bg-white/40 ${level === 0 ? 'font-bold text-slate-800 dark:text-slate-200' : 'text-slate-600 dark:text-slate-400 text-sm'}`}
+          className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors cursor-pointer hover:bg-white/40 ${level === 0 ? 'font-bold text-slate-800 ' : 'text-slate-600  text-sm'}`}
           style={{ paddingLeft: `${level * 24 + 12}px` }}
         >
           <div className="w-5 h-5 flex items-center justify-center shrink-0">
@@ -719,7 +700,7 @@ function StructureView({ txt }: { txt: any, key?: string }) {
               isExpanded ? <ChevronDown className="w-4 h-4 opacity-50" /> : <ChevronRight className="w-4 h-4 opacity-50" />
             ) : null}
           </div>
-          <Icon className={`w-4 h-4 shrink-0 ${node.type === 'person' ? 'text-blue-500' : 'text-slate-500 dark:text-slate-400'}`} />
+          <Icon className={`w-4 h-4 shrink-0 ${node.type === 'person' ? 'text-blue-500' : 'text-slate-500 '}`} />
           <span className="truncate">{node.name}</span>
         </div>
         {hasChildren && isExpanded && (
@@ -756,10 +737,51 @@ function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: a
   const [formData, setFormData] = useState<any>(stats || {});
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Supplier Registry specific states
+  const [supplierProcName, setSupplierProcName] = useState('');
+  const [supplierName, setSupplierName] = useState('');
+  const [supplierType, setSupplierType] = useState('');
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [isAddingSupplier, setIsAddingSupplier] = useState(false);
 
   useEffect(() => {
     if (stats) setFormData(stats);
   }, [stats]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'suppliers'), (snap) => {
+      let docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      docs.sort((a:any, b:any) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+      setSuppliers(docs);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleAddSupplier = async () => {
+    if (!supplierProcName.trim() || !supplierName.trim() || !supplierType.trim()) {
+      alert('Заполните все поля (Наименование закупки, Поставщик, Тип закупки)');
+      return;
+    }
+    setIsAddingSupplier(true);
+    try {
+      await setDoc(doc(collection(db, 'suppliers')), {
+        procurementName: supplierProcName.trim(),
+        supplierName: supplierName.trim(),
+        procurementType: supplierType.trim(),
+        createdAt: serverTimestamp(),
+        addedBy: user?.email || 'Admin'
+      });
+      setSupplierProcName('');
+      setSupplierName('');
+      setSupplierType('');
+    } catch (e) {
+      console.error(e);
+      alert('Ошибка при добавлении поставщика');
+    } finally {
+      setIsAddingSupplier(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!user || !isAdmin) return alert("Ограничено для администратора");
@@ -781,6 +803,49 @@ function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: a
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const autoCalculateQuarters = () => {
+    if (!planData || planData.length === 0) return alert("Нет данных плана для расчета");
+    let q1 = 0, q2 = 0, q3 = 0, q4 = 0;
+    let totalB = 0;
+    
+    const parseNum = (val: any) => {
+      if (!val) return 0;
+      if (typeof val === 'number') return val;
+      const clean = String(val).replace(/\s/g, '').replace(/,/g, '.');
+      return parseFloat(clean) || 0;
+    };
+    
+    planData.forEach(p => {
+      const sum = parseNum(p.totalSumApproB);
+      totalB += sum;
+      const str = String(p.month || p.deliveryPeriodKz || '').toLowerCase();
+      if (str.match(/янв|фев|мар/)) q1 += sum;
+      else if (str.match(/апр|май|июн/)) q2 += sum;
+      else if (str.match(/июл|авг|сен/)) q3 += sum;
+      else if (str.match(/окт|ноя|дек/)) q4 += sum;
+      else {
+        q1 += sum / 4; q2 += sum / 4; q3 += sum / 4; q4 += sum / 4;
+      }
+    });
+
+    const fQ1 = parseFloat(formData.q1Fact) || 0;
+    const fQ2 = parseFloat(formData.q2Fact) || 0;
+    const fQ3 = parseFloat(formData.q3Fact) || 0;
+    const fQ4 = parseFloat(formData.q4Fact) || 0;
+    const computedSavings = fQ1 + fQ2 + fQ3 + fQ4;
+    
+    setFormData((prev: any) => ({
+       ...prev,
+       totalItems: planData.length,
+       totalBudget: Math.round(totalB),
+       savings: computedSavings,
+       q1Plan: Math.round(q1),
+       q2Plan: Math.round(q2),
+       q3Plan: Math.round(q3),
+       q4Plan: Math.round(q4),
+    }));
   };
 
   const handleClearHistory = async () => {
@@ -859,8 +924,8 @@ function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: a
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        <div className="flex flex-col gap-6 glass-card p-6 border-blue-100 bg-blue-50 dark:bg-blue-900/20 shadow-sm h-min">
-          <h3 className="font-bold text-lg text-blue-800 dark:text-blue-300 border-b border-blue-200 dark:border-blue-800/50 pb-2">Основные показатели (Сводные)</h3>
+        <div className="flex flex-col gap-6 glass-card p-6 border-blue-100 bg-blue-50  shadow-sm h-min">
+          <h3 className="font-bold text-lg text-blue-800  border-b border-blue-200  pb-2">Основные показатели (Сводные)</h3>
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label className="text-xs font-bold opacity-60 mb-2 block">ОБЩИЙ БЮДЖЕТ (ТЕНГЕ)</label>
@@ -868,27 +933,68 @@ function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: a
             </div>
             <div>
               <label className="text-xs font-bold opacity-60 mb-2 block">СОХРАНЕННАЯ ЭКОНОМИЯ</label>
-              <input type="number" className="glass-input w-full p-3 font-semibold text-emerald-600 dark:text-emerald-400" value={formData.savings ?? ''} onChange={e => handleChange('savings', e.target.value)} />
+              <input type="number" className="glass-input w-full p-3 font-semibold text-emerald-600 " value={formData.savings ?? ''} onChange={e => handleChange('savings', e.target.value)} />
             </div>
           </div>
           
-          <h3 className="font-bold text-lg text-emerald-800 dark:text-emerald-400 border-b border-emerald-200 dark:border-emerald-800/50 pb-2 mt-4 flex items-center gap-2">
+          <div className="grid grid-cols-3 gap-6 mt-4">
+            <div>
+              <label className="text-[10px] font-bold opacity-60 mb-2 block uppercase">Всего позиций</label>
+              <input type="number" className="glass-input w-full p-3 font-semibold text-sm" value={formData.totalItems ?? ''} onChange={e => handleChange('totalItems', e.target.value)} />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold opacity-60 mb-2 block uppercase">Исполнено позиций</label>
+              <input type="number" className="glass-input w-full p-3 font-semibold text-sm text-indigo-600" value={formData.executionStatusQuantity ?? ''} onChange={e => handleChange('executionStatusQuantity', e.target.value)} />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold opacity-60 mb-2 block uppercase">Исполнение (%)</label>
+              <input type="number" className="glass-input w-full p-3 font-semibold text-sm text-indigo-600" value={formData.executionStatus ?? ''} onChange={e => handleChange('executionStatus', e.target.value)} />
+            </div>
+          </div>
+          
+          <h3 className="font-bold text-lg text-emerald-800  border-b border-emerald-200  pb-2 mt-4 flex items-center gap-2">
              <Building2 className="w-5 h-5 flex-shrink-0" />
              Добавление поставщиков (Реестр)
           </h3>
-          <div className="flex gap-2 items-center">
-             <input type="text" placeholder="БИН или Наименование компании..." className="glass-input w-full p-3 font-medium text-sm" />
-             <button className="bg-emerald-500 hover:bg-emerald-600 text-white p-3 rounded-xl shadow-lg transition-colors flex-shrink-0 font-bold whitespace-nowrap" onClick={() => alert('Функция добавления поставщиков будет интегрирована с АСТАНА-1 в следующем обновлении.')}>
-               + В реестр
-             </button>
+          <div className="flex flex-col gap-3">
+             <input type="text" placeholder="Наименование закупки..." value={supplierProcName} onChange={e => setSupplierProcName(e.target.value)} className="glass-input w-full p-3 font-medium text-sm" />
+             <input type="text" placeholder="Поставщик (название компании)..." value={supplierName} onChange={e => setSupplierName(e.target.value)} className="glass-input w-full p-3 font-medium text-sm" />
+             <div className="flex gap-2">
+               <input type="text" placeholder="Тип закупки (товар, работа, ...)" value={supplierType} onChange={e => setSupplierType(e.target.value)} className="glass-input w-full p-3 font-medium text-sm" />
+               <button 
+                 disabled={isAddingSupplier || !supplierProcName.trim() || !supplierName.trim() || !supplierType.trim()}
+                 className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 rounded-xl shadow-lg transition-colors flex-shrink-0 font-bold whitespace-nowrap disabled:opacity-50" 
+                 onClick={handleAddSupplier}
+               >
+                 + В реестр
+               </button>
+             </div>
           </div>
+          
+          {suppliers.length > 0 && (
+             <div className="mt-4 flex flex-col gap-2 max-h-[300px] overflow-y-auto no-scrollbar border border-emerald-100 rounded-xl bg-white/50 p-2">
+                <div className="text-xs font-bold text-emerald-800 px-2 pt-1 uppercase opacity-60">Реестр поставщиков ({suppliers.length})</div>
+                {suppliers.map(sup => (
+                   <div key={sup.id} className="p-3 bg-white rounded-lg shadow-sm font-medium text-sm border border-emerald-50 flex flex-col gap-1">
+                      <div className="font-bold text-emerald-900">{sup.supplierName}</div>
+                      <div className="text-xs text-slate-500 font-semibold">{sup.procurementName}</div>
+                      <div className="text-[10px] uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded inline-block w-max mt-1">{sup.procurementType}</div>
+                   </div>
+                ))}
+             </div>
+          )}
         </div>
 
-        <div className="flex flex-col gap-6 glass-card p-6 border-indigo-100 dark:border-indigo-800/30 bg-indigo-50/50 dark:bg-indigo-900/10 h-min">
-          <h3 className="font-bold text-lg text-indigo-800 dark:text-indigo-400 border-b border-indigo-200 dark:border-indigo-800/50 pb-2">Исполнение по кварталам</h3>
+        <div className="flex flex-col gap-6 glass-card p-6 border-indigo-100  bg-indigo-50/50  h-min">
+          <div className="flex justify-between items-center border-b border-indigo-200 pb-2">
+            <h3 className="font-bold text-lg text-indigo-800">Исполнение по кварталам</h3>
+            <button onClick={autoCalculateQuarters} className="px-3 py-1.5 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 text-xs font-bold rounded-lg transition-colors">
+              Рассчитать из плана
+            </button>
+          </div>
           <div className="space-y-6">
             {[1, 2, 3, 4].map(q => (
-              <div key={q} className="bg-white/40 dark:bg-slate-800/40 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800/30 shadow-sm relative pt-6">
+              <div key={q} className="bg-white/40  p-4 rounded-xl border border-indigo-100  shadow-sm relative pt-6">
                 <div className="absolute top-0 left-0 bg-indigo-600 text-white text-[10px] font-bold px-3 py-1 rounded-br-lg rounded-tl-xl shadow-sm uppercase tracking-wider">{q}-й квартал</div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -897,15 +1003,15 @@ function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: a
                   </div>
                   <div>
                      <label className="text-[10px] font-bold opacity-60 uppercase mb-1 block">Потенциальная экономия</label>
-                     <input type="number" className="glass-input w-full p-2 text-sm font-medium text-emerald-600 dark:text-emerald-400" value={formData[`q${q}Fact`] ?? ''} onChange={e => handleChange(`q${q}Fact`, e.target.value)} />
+                     <input type="number" className="glass-input w-full p-2 text-sm font-medium text-emerald-600 " value={formData[`q${q}Fact`] ?? ''} onChange={e => handleChange(`q${q}Fact`, e.target.value)} />
                   </div>
                   <div>
                      <label className="text-[10px] font-bold opacity-60 uppercase mb-1 block">Выполнено маркетинга</label>
-                     <input type="number" className="glass-input w-full p-2 text-sm font-medium text-blue-600 dark:text-blue-400" value={formData[`q${q}Marketing`] ?? ''} onChange={e => handleChange(`q${q}Marketing`, e.target.value)} />
+                     <input type="number" className="glass-input w-full p-2 text-sm font-medium text-blue-600 " value={formData[`q${q}Marketing`] ?? ''} onChange={e => handleChange(`q${q}Marketing`, e.target.value)} />
                   </div>
                   <div>
                      <label className="text-[10px] font-bold opacity-60 uppercase mb-1 block">Выполнено приказов</label>
-                     <input type="number" className="glass-input w-full p-2 text-sm font-medium text-amber-600 dark:text-amber-400" value={formData[`q${q}Orders`] ?? ''} onChange={e => handleChange(`q${q}Orders`, e.target.value)} />
+                     <input type="number" className="glass-input w-full p-2 text-sm font-medium text-amber-600 " value={formData[`q${q}Orders`] ?? ''} onChange={e => handleChange(`q${q}Orders`, e.target.value)} />
                   </div>
                 </div>
               </div>
@@ -928,7 +1034,7 @@ function AdminView({ txt, stats, planData, user, isAdmin }: { txt: any, stats: a
         <h3 className="font-bold text-xl text-rose-800 mb-6 flex items-center gap-3">
             <Archive className="w-6 h-6" /> Управление данными (Архивация)
         </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 italic">Данные будут перемещены в корзину, где вы сможете просмотреть их или восстановить.</p>
+        <p className="text-sm text-slate-500  mb-8 italic">Данные будут перемещены в корзину, где вы сможете просмотреть их или восстановить.</p>
         
         <div className="flex flex-wrap gap-6">
             <button 
@@ -1016,7 +1122,7 @@ function HistoryView({ historyData, txt, isAdmin, user }: { historyData: any[], 
                   )}
                   <div className="flex justify-between items-start mb-3 pr-10">
                      <div>
-                       <h3 className="font-bold text-slate-800 dark:text-slate-200 text-lg">Загрузка плана</h3>
+                       <h3 className="font-bold text-slate-800  text-lg">Загрузка плана</h3>
                        <p className="text-xs font-semibold opacity-60">
                          {record.createdAt?.toDate ? format(record.createdAt.toDate(), 'dd.MM.yyyy HH:mm:ss') : 'Неизвестно'}
                        </p>
@@ -1117,10 +1223,10 @@ function TrashView({ trashData, txt, isAdmin }: { trashData: { plan: any[], hist
     >
       <header className="flex justify-between items-center mb-4 flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-200 flex items-center gap-3">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-800  flex items-center gap-3">
              <Archive className="w-8 h-8 text-rose-500" /> {txt.trash || 'Корзина / Архив'}
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium italic">Место для временного хранения удаленных данных</p>
+          <p className="text-sm text-slate-500  mt-1 font-medium italic">Место для временного хранения удаленных данных</p>
         </div>
         <div className="flex items-center gap-4">
           <button 
@@ -1130,16 +1236,16 @@ function TrashView({ trashData, txt, isAdmin }: { trashData: { plan: any[], hist
           >
             <XCircle className="w-4 h-4" /> Очистить всё
           </button>
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 shadow-inner">
+          <div className="flex bg-slate-100  p-1 rounded-xl border border-slate-200 shadow-inner">
              <button 
                onClick={() => setActiveSubTab('plan')}
-               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'plan' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'plan' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500  hover:text-slate-700 :text-slate-300'}`}
              >
                 План закупок ({trashData.plan.length})
              </button>
              <button 
                onClick={() => setActiveSubTab('history')}
-               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'history' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+               className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSubTab === 'history' ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500  hover:text-slate-700 :text-slate-300'}`}
              >
                 История ({trashData.history.length})
              </button>
@@ -1154,8 +1260,8 @@ function TrashView({ trashData, txt, isAdmin }: { trashData: { plan: any[], hist
                  <div key={item.id} className="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center group hover:border-rose-300 transition-all shadow-sm">
                     <div className="flex flex-col gap-1 overflow-hidden pr-4">
                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Удалено {item.deletedAt?.toDate ? format(item.deletedAt.toDate(), 'dd.MM.yyyy HH:mm') : '-'}</span>
-                       <h4 className="font-bold text-slate-800 dark:text-slate-200 truncate" title={item.nameRu}>{item.nameRu}</h4>
-                       <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">№ п/п: {item.rowNum} | Бюджет: {item.totalSumApproB?.toLocaleString('ru-RU')} ₸</span>
+                       <h4 className="font-bold text-slate-800  truncate" title={item.nameRu}>{item.nameRu}</h4>
+                       <span className="text-xs text-slate-500  font-medium">№ п/п: {item.rowNum} | Бюджет: {item.totalSumApproB?.toLocaleString('ru-RU')} ₸</span>
                     </div>
                     <div className="flex gap-2">
                        <button 
@@ -1185,8 +1291,8 @@ function TrashView({ trashData, txt, isAdmin }: { trashData: { plan: any[], hist
                  <div key={record.id} className="bg-white border border-slate-200 p-4 rounded-xl flex justify-between items-center group hover:border-rose-300 transition-all shadow-sm">
                     <div className="flex flex-col gap-1 overflow-hidden pr-4">
                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Удалено {record.deletedAt?.toDate ? format(record.deletedAt.toDate(), 'dd.MM.yyyy HH:mm') : '-'}</span>
-                       <h4 className="font-bold text-slate-800 dark:text-slate-200">Загрузка плана от {record.createdAt?.toDate ? format(record.createdAt.toDate(), 'dd.MM.yyyy') : '-'}</h4>
-                       <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{record.changesSummary}</span>
+                       <h4 className="font-bold text-slate-800 ">Загрузка плана от {record.createdAt?.toDate ? format(record.createdAt.toDate(), 'dd.MM.yyyy') : '-'}</h4>
+                       <span className="text-xs text-slate-500  font-medium">{record.changesSummary}</span>
                     </div>
                     <div className="flex gap-2">
                        <button 
@@ -1398,8 +1504,8 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
       {previewDiff && (
         <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col gap-6">
-            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Предпросмотр загрузки</h3>
-            <p className="text-slate-600 dark:text-slate-400 text-sm">
+            <h3 className="text-2xl font-bold text-slate-800 ">Предпросмотр загрузки</h3>
+            <p className="text-slate-600  text-sm">
               В новом плане <strong>{previewDiff.parsed.length}</strong> позиций. Вот что изменится в базе:
             </p>
             <div className="flex flex-col gap-2">
@@ -1407,7 +1513,7 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
                  <span className="font-medium">Новых позиций:</span>
                  <span className="font-bold text-lg">+{previewDiff.added}</span>
               </div>
-              <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg">
+              <div className="flex justify-between items-center p-3 bg-blue-50  text-blue-700  rounded-lg">
                  <span className="font-medium">Совпадений (Обновлено):</span>
                  <span className="font-bold text-lg">~{previewDiff.updated}</span>
               </div>
@@ -1420,7 +1526,7 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
               <button 
                 disabled={isProcessing}
                 onClick={() => setPreviewDiff(null)}
-                className="px-5 py-2.5 rounded-xl font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                className="px-5 py-2.5 rounded-xl font-medium bg-slate-100  text-slate-700  hover:bg-slate-200 :bg-slate-800 transition-colors"
               >
                 Отмена
               </button>
@@ -1440,12 +1546,12 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
       <div className="p-8 pb-4 flex justify-between items-center shrink-0 flex-wrap gap-4">
          <div className="flex items-center gap-6">
            <h1 className="text-3xl font-bold tracking-tight">{txt.plan}</h1>
-           <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl shadow-inner border border-slate-200">
+           <div className="flex bg-slate-100  p-1 rounded-xl shadow-inner border border-slate-200">
              {menuCategories.map(cat => (
                <button 
                  key={cat.id}
                  onClick={() => setActiveCategory(cat.id as any)}
-                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600  shadow-sm' : 'text-slate-500  hover:text-slate-700 :text-slate-300'}`}
                >
                  {cat.name}
                </button>
@@ -1479,36 +1585,36 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
                <tr className="uppercase tracking-wider">
                  <th className="p-3 bg-indigo-50 text-indigo-900 font-bold sticky left-0 z-10 text-center">Создать</th>
                  <th className="p-3">№ п/п</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Тип пункта плана</th>
+                 <th className="p-3 bg-blue-50 ">Тип пункта плана</th>
                  <th className="p-3">Вид предмета</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Код товара (СТРУ)</th>
+                 <th className="p-3 bg-blue-50 ">Код товара (СТРУ)</th>
                  <th className="p-3">Наименование (KZ)</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Наименование (RU)</th>
+                 <th className="p-3 bg-blue-50 ">Наименование (RU)</th>
                  <th className="p-3">Краткая хар-ка (KZ)</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Краткая хар-ка (RU)</th>
+                 <th className="p-3 bg-blue-50 ">Краткая хар-ка (RU)</th>
                  <th className="p-3">Доп. хар-ка (KZ)</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Доп. хар-ка (RU)</th>
+                 <th className="p-3 bg-blue-50 ">Доп. хар-ка (RU)</th>
                  <th className="p-3">Наименование (Бюджет)</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Способ закупок</th>
+                 <th className="p-3 bg-blue-50 ">Способ закупок</th>
                  <th className="p-3">Ед. изм</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Кол-во</th>
+                 <th className="p-3 bg-blue-50 ">Кол-во</th>
                  <th className="p-3">Цена за ед (без НДС)</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Общая сумма</th>
+                 <th className="p-3 bg-blue-50 ">Общая сумма</th>
                  <th className="p-3">Сумма 2026</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Срок закупок(мес)</th>
+                 <th className="p-3 bg-blue-50 ">Срок закупок(мес)</th>
                  <th className="p-3">Срок поставки (KZ)</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Срок поставки (RU)</th>
+                 <th className="p-3 bg-blue-50 ">Срок поставки (RU)</th>
                  <th className="p-3">КАТО</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Место поставки (KZ)</th>
+                 <th className="p-3 bg-blue-50 ">Место поставки (KZ)</th>
                  <th className="p-3">Место поставки (RU)</th>
-                 <th className="p-3 bg-blue-50 dark:bg-blue-900/20/20">Аванс %</th>
+                 <th className="p-3 bg-blue-50 ">Аванс %</th>
                  <th className="p-3">Инициатор</th>
                </tr>
              </thead>
              <tbody>
                {filteredPlan.map((item, idx) => (
                  <tr key={idx} className="hover:bg-white/50 transition-colors group">
-                   <td className="p-2 border-r border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/50 dark:bg-indigo-900/20 text-center sticky left-0 z-10 group-hover:bg-indigo-100/80 dark:group-hover:bg-indigo-800/40 transition-colors">
+                   <td className="p-2 border-r border-indigo-100  bg-indigo-50/50  text-center sticky left-0 z-10 group-hover:bg-indigo-100/80 :bg-indigo-800/40 transition-colors">
                      <div className="flex items-center justify-center gap-1.5 min-w-[70px]">
                        <button 
                          onClick={() => onSelectSpec(planData.indexOf(item))} 
@@ -1527,35 +1633,35 @@ function PlanView({ txt, planData, user, setPlanData, onSelectSpec }: { txt: any
                      </div>
                    </td>
                    <td className="p-3 font-mono font-medium pl-4">{item.rowNum}</td>
-                   <td className="p-3 max-w-[200px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.type}>{item.type}</td>
+                   <td className="p-3 max-w-[200px] truncate bg-blue-50 " title={item.type}>{item.type}</td>
                    <td className="p-3 max-w-[100px] truncate" title={item.itemKind}>{item.itemKind}</td>
-                   <td className="p-3 font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20/20">{item.code}</td>
+                   <td className="p-3 font-mono text-blue-600  bg-blue-50 ">{item.code}</td>
                    <td className="p-3 max-w-[200px] truncate" title={item.nameKz}>{item.nameKz}</td>
-                   <td className="p-3 max-w-[200px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.nameRu}>{item.nameRu}</td>
+                   <td className="p-3 max-w-[200px] truncate bg-blue-50 " title={item.nameRu}>{item.nameRu}</td>
                    <td className="p-3 max-w-[200px] truncate" title={item.descKz}>{item.descKz}</td>
-                   <td className="p-3 max-w-[200px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.descRu}>{item.descRu}</td>
+                   <td className="p-3 max-w-[200px] truncate bg-blue-50 " title={item.descRu}>{item.descRu}</td>
                    <td className="p-3 max-w-[250px] truncate" title={item.extraDescKz}>{item.extraDescKz}</td>
-                   <td className="p-3 max-w-[250px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.extraDescRu}>{item.extraDescRu}</td>
+                   <td className="p-3 max-w-[250px] truncate bg-blue-50 " title={item.extraDescRu}>{item.extraDescRu}</td>
                    <td className="p-3 max-w-[200px] truncate" title={item.budgetRuName}>{item.budgetRuName}</td>
-                   <td className="p-3 font-semibold bg-blue-50 dark:bg-blue-900/20/20">{item.procurementMethod}</td>
+                   <td className="p-3 font-semibold bg-blue-50 ">{item.procurementMethod}</td>
                    <td className="p-3">{item.unit}</td>
-                   <td className="p-3 text-right font-mono bg-blue-50 dark:bg-blue-900/20/20">{Number(item.quantity).toLocaleString()}</td>
+                   <td className="p-3 text-right font-mono bg-blue-50 ">{Number(item.quantity).toLocaleString()}</td>
                    <td className="p-3 text-right font-mono">{Number(item.unitPrice).toLocaleString()}</td>
-                   <td className="p-3 text-right font-mono font-semibold bg-blue-50 dark:bg-blue-900/20/20">{Number(item.totalSumApproB).toLocaleString()}</td>
+                   <td className="p-3 text-right font-mono font-semibold bg-blue-50 ">{Number(item.totalSumApproB).toLocaleString()}</td>
                    <td className="p-3 text-right font-mono">{Number(item.sum2026).toLocaleString()}</td>
-                   <td className="p-3 bg-blue-50 dark:bg-blue-900/20/20">{item.month}</td>
+                   <td className="p-3 bg-blue-50 ">{item.month}</td>
                    <td className="p-3 max-w-[150px] truncate" title={item.deliveryPeriodKz}>{item.deliveryPeriodKz}</td>
-                   <td className="p-3 max-w-[150px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.deliveryPeriodRu}>{item.deliveryPeriodRu}</td>
+                   <td className="p-3 max-w-[150px] truncate bg-blue-50 " title={item.deliveryPeriodRu}>{item.deliveryPeriodRu}</td>
                    <td className="p-3 font-mono">{item.kato}</td>
-                   <td className="p-3 max-w-[200px] truncate bg-blue-50 dark:bg-blue-900/20/20" title={item.deliveryPlaceKz}>{item.deliveryPlaceKz}</td>
+                   <td className="p-3 max-w-[200px] truncate bg-blue-50 " title={item.deliveryPlaceKz}>{item.deliveryPlaceKz}</td>
                    <td className="p-3 max-w-[200px] truncate" title={item.deliveryPlaceRu}>{item.deliveryPlaceRu}</td>
-                   <td className="p-3 text-center bg-blue-50 dark:bg-blue-900/20/20">{item.advancePercent}</td>
+                   <td className="p-3 text-center bg-blue-50 ">{item.advancePercent}</td>
                    <td className="p-3 max-w-[150px] truncate" title={item.initiator}>{item.initiator}</td>
                  </tr>
                ))}
                {filteredPlan.length === 0 && (
                  <tr>
-                   <td colSpan={25} className="p-8 text-center text-slate-500 dark:text-slate-400 font-medium">
+                   <td colSpan={25} className="p-8 text-center text-slate-500  font-medium">
                       Нет данных или не найдено совпадений
                    </td>
                  </tr>
@@ -1698,14 +1804,14 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
         <div className="flex justify-between items-center">
            <h1 className="text-3xl font-bold tracking-tight">{txt.spec}</h1>
            <div className="flex gap-4">
-             <button onClick={handleExportWord} className="glass-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20/50">
+             <button onClick={handleExportWord} className="glass-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-blue-600  hover:bg-blue-50 :bg-blue-900/20/50">
                <Download className="w-5 h-5" /> {txt.exportWord}
              </button>
            </div>
         </div>
 
         {/* Settings for generating document */}
-        <div className="glass-card p-6 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border-blue-200 dark:border-blue-800/50/50 relative overflow-hidden shadow-sm">
+        <div className="glass-card p-6 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border-blue-200  relative overflow-hidden shadow-sm">
            <div className="absolute right-0 bottom-0 opacity-5 mix-blend-overlay pointer-events-none">
              <Settings className="w-64 h-64 translate-x-12 translate-y-12" />
            </div>
@@ -1718,7 +1824,7 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
                  <button 
                    key={cat.id}
                    onClick={() => setActiveCategory(cat.id as any)}
-                   className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                   className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${activeCategory === cat.id ? 'bg-white text-blue-600  shadow-sm' : 'text-slate-500  hover:text-slate-700 :text-slate-300'}`}
                  >
                    {cat.name}
                  </button>
@@ -1728,7 +1834,7 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
              <select 
                value={selectedSpecIndex} 
                onChange={e => setSelectedSpecIndex(Number(e.target.value))}
-               className="glass-input px-3 py-2 text-sm font-medium w-full text-slate-800 dark:text-slate-200 bg-white/70 cursor-pointer outline-none hover:bg-white/90 transition-colors" 
+               className="glass-input px-3 py-2 text-sm font-medium w-full text-slate-800  bg-white/70 cursor-pointer outline-none hover:bg-white/90 transition-colors" 
              >
                <option value={-1} disabled>-- Выберите из категории {activeCategory === 'all' ? 'Все' : menuCategories.find(c => c.id === activeCategory)?.name} --</option>
                {filteredOptions.length === 0 ? (
@@ -1743,17 +1849,17 @@ function SpecView({ txt, lang, planData, selectedSpecIndex, setSelectedSpecIndex
            
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
               <div className="flex flex-col gap-2">
-                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">{txt.approverFields}</h3>
+                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500  mb-1">{txt.approverFields}</h3>
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={approverPosition} onChange={e => setApproverPosition(e.target.value)} placeholder={txt.position} />
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={approverFIO} onChange={e => setApproverFIO(e.target.value)} placeholder={txt.fio} />
               </div>
               <div className="flex flex-col gap-2">
-                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">{txt.developerFields}</h3>
+                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500  mb-1">{txt.developerFields}</h3>
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={developerPosition} onChange={e => setDeveloperPosition(e.target.value)} placeholder={txt.position} />
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={developerFIO} onChange={e => setDeveloperFIO(e.target.value)} placeholder={txt.fio} />
               </div>
               <div className="flex flex-col gap-2">
-                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">{txt.extraFields}</h3>
+                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500  mb-1">{txt.extraFields}</h3>
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={paymentTerms} onChange={e => setPaymentTerms(e.target.value)} placeholder={txt.paymentTermsPlaceholder} />
                  <input type="text" className="glass-input w-full text-sm p-2.5 font-medium" value={warranty} onChange={e => setWarranty(e.target.value)} placeholder={txt.warrantyPlaceholder} />
                  <textarea className="glass-input w-full text-sm p-2.5 font-medium resize-none" value={reqDescStr} onChange={e => setReqDescStr(e.target.value)} placeholder={txt.reqDescPlaceholder} rows={2} />
@@ -1873,6 +1979,7 @@ function CabinetView({ user }: { user: any, key?: string }) {
   const [unit, setUnit] = useState('');
   const [price, setPrice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cryptoStatus, setCryptoStatus] = useState<string | null>(null);
   const isOnline = navigator.onLine;
 
   useEffect(() => {
@@ -1889,49 +1996,112 @@ function CabinetView({ user }: { user: any, key?: string }) {
     return () => unsub();
   }, [user]);
 
-  const handleSubmit = async () => {
-    if (!name.trim() || !qty.trim()) return;
-    setIsSubmitting(true);
+  const saveRequest = async (signatureData: any = null) => {
     try {
        await setDoc(doc(collection(db, 'initiatorRequests')), {
          name, 
          quantity: qty, 
          unit, 
          price,
-         author: user?.email || 'Аноним',
          status: 'В обработке',
+         author: user?.email || 'unknown',
+         signature: signatureData,
          createdAt: serverTimestamp()
        });
        setName(''); setQty(''); setUnit(''); setPrice('');
     } catch(e) {
        console.error(e);
-       alert('Ошибка при отправке');
+       alert('Ошибка при сохранении заявки.');
+    } finally {
+       setIsSubmitting(false);
+       setCryptoStatus(null);
     }
-    setIsSubmitting(false);
+  };
+
+  const handleSubmit = async () => {
+    if (!name.trim() || !qty.trim()) return;
+    setIsSubmitting(true);
+    await saveRequest();
+  };
+
+  const handleNCASign = async () => {
+    if (!name.trim() || !qty.trim()) return;
+    setIsSubmitting(true);
+    setCryptoStatus('Подключение к NCALayer...');
+
+    const documentData = `Заявка: ${name}, Кол-во: ${qty} ${unit}, Цена: ${price}, Автор: ${user?.email}`;
+    // Base64 encode for NCALayer
+    const base64Data = btoa(unescape(encodeURIComponent(documentData)));
+
+    const webSocket = new WebSocket('wss://127.0.0.1:13579/');
+    
+    // Timeout for connection
+    const connectionTimeout = setTimeout(() => {
+       if (webSocket.readyState !== WebSocket.OPEN) {
+          webSocket.close();
+          setCryptoStatus('connection_failed');
+       }
+    }, 2000);
+
+    webSocket.onopen = () => {
+       clearTimeout(connectionTimeout);
+       setCryptoStatus('Ожидание подписи (Выберите ключ в NCALayer)...');
+       
+       const callObj = {
+          "module": "kz.gov.pki.knca.commonUtils",
+          "method": "createCMSSignature",
+          "args": [base64Data, "PKCS12", "", "", true]
+       };
+       webSocket.send(JSON.stringify(callObj));
+    };
+
+    webSocket.onmessage = (event) => {
+       const result = JSON.parse(event.data);
+       if (result && result.code === '200') {
+          saveRequest({
+             cms: result.responseObject,
+             subjectName: `Signed by NCALayer (${user?.email})`,
+             signedAt: new Date().toISOString()
+          });
+       } else {
+          setCryptoStatus('error:' + (result?.message || 'Неизвестная ошибка'));
+          setIsSubmitting(false);
+       }
+    };
+
+    webSocket.onclose = (event) => {
+       if (!event.wasClean && cryptoStatus && cryptoStatus !== 'connection_failed') {
+         console.log('NCALayer connection closed.');
+         if (cryptoStatus.startsWith('Подключение')) setCryptoStatus('connection_failed');
+       }
+    };
   };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 h-full flex flex-col pt-12 overflow-y-auto w-full">
        <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-200 dark:border-emerald-800">
+          <div className="w-16 h-16 bg-emerald-100  rounded-2xl flex items-center justify-center text-emerald-600  shadow-sm border border-emerald-200 ">
              <User className="w-8 h-8" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold dark:text-white">Панель Инициатора (Мои заявки)</h2>
-            <p className="text-slate-500 dark:text-slate-400 font-medium">Подача заявок на включение в план напрямую</p>
+            <h2 className="text-3xl font-bold ">Панель Инициатора (Мои заявки)</h2>
+            <p className="text-slate-500  font-medium">Подача заявок на включение в план напрямую</p>
           </div>
        </div>
 
        {!isOnline && (
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 p-4 rounded-xl flex items-center gap-3 mb-6 animate-pulse font-medium max-w-2xl">
+          <div className="bg-amber-50  border border-amber-200  text-amber-700  p-4 rounded-xl flex items-center gap-3 mb-6 animate-pulse font-medium max-w-2xl">
              <WifiOff className="w-5 h-5 shrink-0" />
              Нет интернета. Офлайн-режим активен (PWA). Заявки не будут доставлены до появления сети.
           </div>
        )}
 
        <div className="glass-card max-w-2xl p-8 flex flex-col gap-4">
-          <h3 className="font-bold text-lg border-b border-slate-200 dark:border-slate-700 pb-2 dark:text-white">Сформировать потребность (Zero Paper)</h3>
-          <p className="text-sm opacity-70 mb-4 dark:text-slate-300">Укажите наименование, количество, цену и отправьте в обработку. Данные поступят экономистам напрямую.</p>
+          <h3 className="font-bold text-lg border-b border-slate-200  pb-2 flex items-center gap-2">
+             <span>Сформировать потребность (Юридически значимый документооборот)</span>
+             <span className="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Zero Paper</span>
+          </h3>
+          <p className="text-sm opacity-70 mb-4 ">Укажите наименование, количество, цену и отправьте в обработку. Вы можете подписать заявку с помощью ЭЦП (NCALayer).</p>
           
           <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Наименование (например, Реле РЭЛ-1М)" className="glass-input p-3" />
           <div className="flex gap-4">
@@ -1940,36 +2110,112 @@ function CabinetView({ user }: { user: any, key?: string }) {
             <input type="text" value={price} onChange={e => setPrice(e.target.value)} placeholder="Примерная цена" className="glass-input p-3 w-1/3" />
           </div>
           
-          <button 
-             disabled={isSubmitting || !name.trim() || !qty.trim()} 
-             onClick={handleSubmit} 
-             className="glass-btn-primary py-3 rounded-xl font-bold mt-4 shadow-lg shadow-blue-500/20 disabled:opacity-50"
-          >
-            {isSubmitting ? 'Отправка...' : 'Отправить в обработку'}
-          </button>
+          {cryptoStatus && cryptoStatus !== 'connection_failed' && !cryptoStatus.startsWith('error:') && (
+             <div className="bg-blue-50 border border-blue-200 p-3 rounded-xl text-sm text-blue-700 font-medium flex items-center gap-3 animate-pulse mt-4">
+                <ShieldCheck className="w-5 h-5" />
+                {cryptoStatus}
+             </div>
+          )}
+          {cryptoStatus && cryptoStatus.startsWith('error:') && (
+             <div className="bg-red-50 border border-red-200 p-3 rounded-xl text-sm text-red-700 font-medium flex items-center gap-3 mt-4">
+                <AlertTriangle className="w-5 h-5" />
+                Ошибка подписания: {cryptoStatus.replace('error:', '')}
+                <button onClick={() => setCryptoStatus(null)} className="ml-auto text-red-900 font-bold px-2 py-1 bg-red-100 rounded">ОК</button>
+             </div>
+          )}
+          {cryptoStatus === 'connection_failed' && (
+             <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-sm text-amber-800 flex flex-col gap-3 mt-4">
+                <div className="flex items-center gap-2 font-bold mb-1">
+                   <AlertTriangle className="w-5 h-5 text-amber-600" />
+                   Не удалось подключиться к NCALayer (Возможно, он не запущен)
+                </div>
+                <p className="opacity-80">Для демонстрации процесса согласования вы можете симулировать успешную подпись ЭЦП ГОСТ.</p>
+                <div className="flex gap-2 mt-2">
+                   <button 
+                      onClick={() => {
+                         setCryptoStatus('Симуляция подписи ГОСТ 34.310-2004...');
+                         setTimeout(() => {
+                            saveRequest({
+                              isSimulated: true,
+                              thumbprint: '0A1B2C3D4E5F67890A1B2C3D4E5F67890A1B2C3D',
+                              subjectName: `CN=${user?.email || 'Иванов И.И.'}, O=Ктж, C=KZ`,
+                              signedAt: new Date().toISOString()
+                            });
+                         }, 1500);
+                      }} 
+                      className="bg-amber-500 hover:bg-amber-600 shadow-md text-white px-4 py-2 rounded-lg font-bold transition-all"
+                   >
+                      Симулировать подпись
+                   </button>
+                   <button 
+                      onClick={() => {
+                         setIsSubmitting(false);
+                         setCryptoStatus(null);
+                      }} 
+                      className="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-200 px-4 py-2 rounded-lg font-bold transition-all"
+                   >
+                      Отмена
+                   </button>
+                </div>
+             </div>
+          )}
+
+          <div className="flex gap-4 mt-4">
+             <button 
+                disabled={isSubmitting || !name.trim() || !qty.trim()} 
+                onClick={handleSubmit} 
+                className="bg-slate-100 text-slate-700 hover:bg-slate-200 py-3 px-6 rounded-xl font-bold transition-all disabled:opacity-50 flex-1"
+             >
+               Черновик (Без подписи)
+             </button>
+             <button 
+                disabled={isSubmitting || !name.trim() || !qty.trim()} 
+                onClick={handleNCASign} 
+                className="bg-gradient-to-r from-indigo-600 to-blue-500 text-white hover:from-indigo-700 hover:to-blue-600 shadow-lg shadow-indigo-500/30 py-3 px-6 rounded-xl font-bold transition-all disabled:opacity-50 flex-1 flex items-center justify-center gap-2"
+             >
+               <ShieldCheck className="w-5 h-5" />
+               Подписать ЭЦП (NCALayer)
+             </button>
+          </div>
        </div>
        
        <div className="mt-12 max-w-2xl">
-          <h4 className="font-bold mb-4 opacity-70 dark:text-slate-300 flex items-center gap-2">
+          <h4 className="font-bold mb-4 opacity-70  flex items-center gap-2">
              <List className="w-5 h-5" /> 
              История моих заявок
           </h4>
           <div className="flex flex-col gap-3">
              {requests.length === 0 ? (
-                <div className="text-slate-500 dark:text-slate-400">Заявок пока нет.</div>
+                <div className="text-slate-500 ">Заявок пока нет.</div>
              ) : (
                 requests.map(r => (
-                  <div key={r.id} className="bg-white/40 dark:bg-slate-800/40 p-5 rounded-xl border border-white/30 dark:border-slate-700/50 flex flex-col gap-2 dark:text-slate-200">
-                     <div className="flex justify-between items-center">
-                        <span className="font-bold text-lg">{r.name}</span>
-                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${r.status === 'В обработке' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
-                           {r.status}
-                        </span>
+                  <div key={r.id} className="bg-white/40  p-5 rounded-xl border border-white/30  flex flex-col gap-2 ">
+                     <div className="flex justify-between items-start">
+                        <div className="flex flex-col">
+                           <span className="font-bold text-lg">{r.name}</span>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                           <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${r.status === 'В обработке' ? 'bg-amber-100 text-amber-700  ' : 'bg-emerald-100 text-emerald-700  '}`}>
+                              {r.status}
+                           </span>
+                           {r.signature && (
+                              <div className="flex items-center gap-1 text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-lg">
+                                 <ShieldCheck className="w-3 h-3" />
+                                 <span>Подписано ЭЦП ({r.signature.isSimulated ? 'Демо' : 'ГОСТ'})</span>
+                              </div>
+                           )}
+                        </div>
                      </div>
                      <div className="text-sm opacity-70 flex gap-4">
                         <span>Кол-во: {r.quantity} {r.unit}</span>
                         {r.price && <span>Цена: {r.price}</span>}
                      </div>
+                     {r.signature && (
+                        <div className="mt-2 text-[10px] font-mono text-slate-400 bg-slate-50 p-2 rounded border border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap">
+                           Субъект: {r.signature.subjectName}<br/>
+                           Хэш: {r.signature.thumbprint || 'Настоящая CMS подпись скрыта'}
+                        </div>
+                     )}
                      <div className="text-xs font-mono opacity-50 mt-2">
                         Отправлено: {r.createdAt ? new Date(r.createdAt.toMillis()).toLocaleString() : 'Только что'}
                      </div>
@@ -1982,40 +2228,134 @@ function CabinetView({ user }: { user: any, key?: string }) {
   )
 }
 
-function WikiView() {
+function WikiView({ isAdmin, user }: { isAdmin: boolean, user: any }) {
+  const [articles, setArticles] = useState<any[]>([]);
+  const [search, setSearch] = useState('');
+  const [editingArticle, setEditingArticle] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'wikiArticles'), (snap) => {
+      let docs: any[] = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      docs.sort((a:any, b:any) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+      // Pre-seed if empty
+      if (docs.length === 0) {
+        docs = [
+          { id: '1', title: 'Аварийный закуп (Из одного источника)', content: 'Что делать, если сломалась стрелка и деталь нужна "еще вчера". Полный алгоритм согласований.' },
+          { id: '2', title: 'Требования к МСБ и ОТП в 2026 году', content: 'Список обязательных сертификатов качества (СТ-KZ) для защиты процента местного содержания.' },
+          { id: '3', title: 'Разделение бюджета OPEX и CAPEX', content: 'Как правильно классифицировать закупку: это ОС или расходники? Инструкция для инженеров.' },
+          { id: '4', title: 'Частые ошибки в Тех.Спецификациях', content: 'Почему юристы заворачивают документы: разбор ТОП-5 ошибок, чтобы не переделывать.' }
+        ];
+      }
+      setArticles(docs);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleSave = async () => {
+    if (!title.trim() || !content.trim()) return alert('Заполните заголовок и содержание');
+    setIsSaving(true);
+    try {
+      if (editingArticle && editingArticle.id.length > 5) {
+        await setDoc(doc(db, 'wikiArticles', editingArticle.id), {
+          title, content, updatedAt: serverTimestamp(), updatedBy: user?.email
+        }, { merge: true });
+      } else {
+        await setDoc(doc(collection(db, 'wikiArticles')), {
+          title, content, createdAt: serverTimestamp(), createdBy: user?.email
+        });
+      }
+      setIsModalOpen(false);
+      setEditingArticle(null);
+      setTitle('');
+      setContent('');
+    } catch (e) {
+      console.error(e);
+      alert('Ошибка при сохранении');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isAdmin) return;
+    if (!confirm('Удалить эту статью?')) return;
+    try {
+      if (id.length > 5) {
+        await deleteDoc(doc(db, 'wikiArticles', id));
+      } else {
+        setArticles(prev => prev.filter(x => x.id !== id));
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  };
+
+  const filtered = articles.filter(a => a.title.toLowerCase().includes(search.toLowerCase()) || a.content.toLowerCase().includes(search.toLowerCase()));
+
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 h-full flex flex-col pt-12 overflow-y-auto w-full">
-       <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm border border-blue-200 dark:border-blue-800/50 dark:border-blue-800">
-             <BookOpen className="w-8 h-8" />
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-8 h-full flex flex-col pt-12 overflow-y-auto w-full relative">
+       <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-blue-100  rounded-2xl flex items-center justify-center text-blue-600  shadow-sm border border-blue-200  ">
+               <BookOpen className="w-8 h-8" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold ">База Знаний (Вики)</h2>
+              <p className="text-slate-500  font-medium">Регламенты, инструкции и FAQ для всех сотрудников DTJ</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-3xl font-bold dark:text-white">База Знаний (Вики)</h2>
-            <p className="text-slate-500 dark:text-slate-400 font-medium">Регламенты, инструкции и FAQ для всех сотрудников DTJ</p>
-          </div>
+          {isAdmin && (
+            <button onClick={() => { setEditingArticle(null); setTitle(''); setContent(''); setIsModalOpen(true); }} className="bg-blue-600 text-white px-5 py-3 rounded-xl shadow-lg hover:bg-blue-700 font-bold transition-colors">
+              + Добавить статью
+            </button>
+          )}
        </div>
 
        <div className="relative max-w-3xl mb-8">
-         <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 w-5 h-5 dark:text-slate-400" />
-         <input type="text" placeholder="Найти инструкцию (например, 'Как заключить допник')" className="glass-input w-full p-4 pl-12 text-lg shadow-lg dark:text-slate-200" />
+         <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40 w-5 h-5 " />
+         <input type="text" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Найти инструкцию (например, 'Как заключить допник')" className="glass-input w-full p-4 pl-12 text-lg shadow-lg " />
        </div>
 
-       <div className="grid grid-cols-2 gap-6 max-w-5xl">
-          {[
-            { t: 'Аварийный закуп (Из одного источника)', d: 'Что делать, если сломалась стрелка и деталь нужна "еще вчера". Полный алгоритм согласований.' },
-            { t: 'Требования к МСБ и ОТП в 2026 году', d: 'Список обязательных сертификатов качества (СТ-KZ) для защиты процента местного содержания.' },
-            { t: 'Разделение бюджета OPEX и CAPEX', d: 'Как правильно классифицировать закупку: это ОС или расходники? Инструкция для инженеров.' },
-            { t: 'Частые ошибки в Тех.Спецификациях', d: 'Почему юристы заворачивают документы: разбор ТОП-5 ошибок, чтобы не переделывать.' }
-          ].map((w, i) => (
-            <div key={i} className="glass-card p-6 flex flex-col gap-3 hover:translate-y-[-2px] hover:shadow-xl transition-all cursor-pointer border border-white/40 dark:border-slate-700/50">
-               <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center rounded-xl text-indigo-500 mb-2">
+       <div className="grid grid-cols-2 gap-6 max-w-5xl pb-12">
+          {filtered.map((w, i) => (
+            <div key={w.id || i} onClick={() => { if(isAdmin){ setEditingArticle(w); setTitle(w.title); setContent(w.content); setIsModalOpen(true); } }} className="glass-card p-6 flex flex-col gap-3 hover:translate-y-[-2px] hover:shadow-xl transition-all cursor-pointer border border-white/40 relative group">
+               {isAdmin && (
+                 <button onClick={(e) => handleDelete(w.id, e)} className="absolute top-4 right-4 p-2 bg-rose-100 text-rose-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                   <Trash2 className="w-4 h-4" />
+                 </button>
+               )}
+               <div className="w-10 h-10 bg-indigo-50  flex items-center justify-center rounded-xl text-indigo-500 mb-2">
                  <FileText className="w-5 h-5" />
                </div>
-               <h3 className="font-bold text-lg dark:text-white leading-tight">{w.t}</h3>
-               <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{w.d}</p>
+               <h3 className="font-bold text-lg  leading-tight">{w.title}</h3>
+               <p className="text-slate-500  text-sm leading-relaxed whitespace-pre-wrap">{w.content}</p>
             </div>
           ))}
+          {filtered.length === 0 && <div className="col-span-2 text-slate-500 italic p-4">Статей не найдено.</div>}
        </div>
+
+       {isModalOpen && (
+         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/20 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
+            <div className="bg-white rounded-2xl w-[600px] max-w-full shadow-2xl p-6 flex flex-col" onClick={e=>e.stopPropagation()}>
+               <h3 className="text-xl font-bold mb-4">{editingArticle ? 'Редактировать статью' : 'Добавить статью'}</h3>
+               <div className="flex flex-col gap-4">
+                  <input type="text" placeholder="Заголовок" value={title} onChange={e=>setTitle(e.target.value)} className="glass-input p-3 w-full font-bold" />
+                  <textarea placeholder="Содержание статьи..." value={content} onChange={e=>setContent(e.target.value)} className="glass-input p-3 w-full min-h-[150px]" />
+               </div>
+               <div className="mt-6 flex justify-end gap-3">
+                  <button onClick={() => setIsModalOpen(false)} className="px-5 py-2 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors">Отмена</button>
+                  <button disabled={isSaving || !title.trim() || !content.trim()} onClick={handleSave} className="px-5 py-2 font-bold bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
+                    {isSaving ? 'Сохранение...' : 'Сохранить'}
+                  </button>
+               </div>
+            </div>
+         </div>
+       )}
     </motion.div>
   )
 }
@@ -2107,7 +2447,7 @@ function ItemDiscussionModal({ item, user, onClose, planData }: { item: Procurem
      return parts.map((part, i) => {
         if (part.startsWith('@')) {
            return (
-             <span key={i} className={`font-bold px-1 rounded mx-[1px] ${isMe ? 'text-indigo-100 bg-indigo-600' : 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/40 dark:text-indigo-300'}`}>
+             <span key={i} className={`font-bold px-1 rounded mx-[1px] ${isMe ? 'text-indigo-100 bg-indigo-600' : 'text-indigo-600 bg-indigo-100  '}`}>
                 {part.replace(/_/g, ' ')}
              </span>
            );
@@ -2123,34 +2463,34 @@ function ItemDiscussionModal({ item, user, onClose, planData }: { item: Procurem
          animate={{ x: 0, opacity: 1 }} 
          exit={{ x: 400, opacity: 0 }}
          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-         className="w-[450px] bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800 relative"
+         className="w-[450px] bg-white  h-full shadow-2xl flex flex-col border-l border-slate-200  relative"
        >
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start bg-slate-50 dark:bg-slate-900 dark:bg-slate-800/50">
+          <div className="p-6 border-b border-slate-100  flex justify-between items-start bg-slate-50  ">
              <div>
-                <h3 className="font-bold text-lg dark:text-white flex items-center gap-2"><MessageSquare className="w-5 h-5 text-indigo-500" /> Обсуждение</h3>
+                <h3 className="font-bold text-lg  flex items-center gap-2"><MessageSquare className="w-5 h-5 text-indigo-500" /> Обсуждение</h3>
                 <p className="text-xs opacity-60 mt-1 max-w-[300px] truncate" title={item.nameRu}>{item.nameRu}</p>
                 <div className="text-[10px] uppercase font-bold text-indigo-600 mt-2 bg-indigo-100 inline-block px-2 py-0.5 rounded">Лот № {item.rowNum}</div>
              </div>
-             <button onClick={onClose} className="p-2 bg-slate-200 dark:bg-slate-800 dark:bg-slate-700 rounded-full hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
-                <XCircle className="w-5 h-5 text-slate-500 dark:text-slate-400 dark:text-slate-300" />
+             <button onClick={onClose} className="p-2 bg-slate-200   rounded-full hover:bg-slate-300 :bg-slate-600 transition-colors">
+                <XCircle className="w-5 h-5 text-slate-500  " />
              </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-slate-50 dark:bg-slate-900/50 dark:bg-slate-900/50">
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-slate-50  ">
              {messages.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50">
-                   <MessageSquare className="w-12 h-12 mb-3 dark:text-slate-400" />
-                   <p className="text-sm font-medium dark:text-slate-400">Пока нет комментариев.<br/>Задайте вопрос по этой закупке.</p>
+                   <MessageSquare className="w-12 h-12 mb-3 " />
+                   <p className="text-sm font-medium ">Пока нет комментариев.<br/>Задайте вопрос по этой закупке.</p>
                 </div>
              ) : (
                 messages.map(m => {
                   const isMe = m.userName === user?.email;
                   return (
                     <div key={m.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                       <span className="text-[10px] opacity-40 font-semibold mb-1 px-1 flex gap-2 dark:text-slate-400">
+                       <span className="text-[10px] opacity-40 font-semibold mb-1 px-1 flex gap-2 ">
                          {m.userName}
                        </span>
-                       <div className={`px-4 py-2.5 max-w-[85%] rounded-2xl text-sm leading-relaxed shadow-sm ${isMe ? 'bg-indigo-500 text-white rounded-tr-sm' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-tl-sm dark:text-slate-200'}`}>
+                       <div className={`px-4 py-2.5 max-w-[85%] rounded-2xl text-sm leading-relaxed shadow-sm ${isMe ? 'bg-indigo-500 text-white rounded-tr-sm' : 'bg-white  border border-slate-200  rounded-tl-sm '}`}>
                           {renderComment(m.text, isMe)}
                        </div>
                     </div>
@@ -2159,18 +2499,18 @@ function ItemDiscussionModal({ item, user, onClose, planData }: { item: Procurem
              )}
           </div>
 
-          <div className="relative border-t border-slate-100 dark:border-slate-800">
+          <div className="relative border-t border-slate-100 ">
              <AnimatePresence>
                 {mentionSearch !== null && filteredMentions.length > 0 && (
                   <motion.div 
                      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
-                     className="absolute bottom-full left-4 mb-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl rounded-xl w-64 max-h-48 overflow-y-auto z-20"
+                     className="absolute bottom-full left-4 mb-2 bg-white  border border-slate-200  shadow-xl rounded-xl w-64 max-h-48 overflow-y-auto z-20"
                   >
                      {filteredMentions.map(m => (
                         <button
                            key={m}
                            type="button"
-                           className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:bg-slate-700/50 text-sm transition-colors dark:text-white border-b border-slate-100 dark:border-slate-700/30 last:border-0 truncate"
+                           className="w-full text-left px-4 py-2 hover:bg-slate-100 :bg-slate-800 :bg-slate-700/50 text-sm transition-colors  border-b border-slate-100  last:border-0 truncate"
                            onClick={() => insertMention(m)}
                         >
                            {m}
@@ -2180,14 +2520,14 @@ function ItemDiscussionModal({ item, user, onClose, planData }: { item: Procurem
                 )}
              </AnimatePresence>
 
-             <form onSubmit={send} className="p-4 bg-white dark:bg-slate-900 flex gap-3">
+             <form onSubmit={send} className="p-4 bg-white  flex gap-3">
                 <input 
                   ref={inputRef}
                   type="text" 
                   value={text}
                   onChange={handleTextChange}
                   placeholder="Напишите комментарий..."
-                  className="flex-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-400 transition-colors dark:text-white"
+                  className="flex-1 bg-slate-100  border border-slate-200  px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-400 transition-colors "
                 />
                 <button type="submit" disabled={!text.trim()} className="bg-indigo-500 hover:bg-indigo-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-colors shrink-0">
                    <Send className="w-5 h-5 -ml-1" />
